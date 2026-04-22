@@ -4,176 +4,154 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Windrose Server Finder</title>
+
   <style>
     body {
       background: #000;
       color: #fff;
       font-family: Arial, sans-serif;
-      margin: 0;
       padding: 30px;
     }
 
-    h1 {
-      font-size: 48px;
-      margin-bottom: 30px;
-    }
-
-    h2 {
-      margin-top: 30px;
-      margin-bottom: 15px;
-    }
+    h1 { font-size: 42px; margin-bottom: 20px; }
+    h2 { margin-top: 30px; }
 
     input, button {
       display: block;
       width: 100%;
       max-width: 420px;
       padding: 12px;
-      margin-bottom: 12px;
-      font-size: 18px;
-      box-sizing: border-box;
+      margin-bottom: 10px;
+      font-size: 16px;
     }
 
-    button {
-      cursor: pointer;
-    }
-
-    .error {
-      color: #ff6b6b;
-      margin: 12px 0;
-      font-size: 18px;
-    }
-
-    .success {
-      color: #7dff7d;
-      margin: 12px 0;
-      font-size: 18px;
-    }
+    .error { color: red; }
+    .success { color: lime; }
 
     .server {
-      border: 1px solid #333;
       background: #111;
-      padding: 15px;
-      margin-top: 12px;
-      max-width: 600px;
-    }
-
-    .server-name {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    .server-code {
-      color: #ccc;
+      border: 1px solid #333;
+      padding: 10px;
+      margin-top: 10px;
     }
   </style>
 </head>
+
 <body>
-  <h1>Windrose Server Finder</h1>
 
-  <h2>Post Server</h2>
+<h1>Windrose Server Finder</h1>
 
-  <input id="name" placeholder="Server Name" />
-  <input id="code" placeholder="Invite Code" />
-  <button id="postBtn">Post</button>
+<h2>Post Server</h2>
 
-  <div id="message"></div>
+<input id="name" placeholder="Server Name" />
+<input id="code" placeholder="Invite Code" />
+<button id="postBtn">Post</button>
 
-  <h2>Servers</h2>
-  <div id="list">Loading...</div>
+<div id="message"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = "https://yfzifzllysjuglaywsdn.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
+<h2>Servers</h2>
+<div id="list">Loading...</div>
 
-    const messageBox = document.getElementById("message");
-    const list = document.getElementById("list");
-    const nameInput = document.getElementById("name");
-    const codeInput = document.getElementById("code");
-    const postBtn = document.getElementById("postBtn");
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    function showMessage(text, type = "error") {
-      messageBox.className = type;
-      messageBox.textContent = text;
+<script>
+  // 🔑 PASTE YOUR NEW KEY HERE
+  const SUPABASE_URL = "https://yfzifzllysjuglaywsdn.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
+
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const nameInput = document.getElementById("name");
+  const codeInput = document.getElementById("code");
+  const postBtn = document.getElementById("postBtn");
+  const list = document.getElementById("list");
+  const messageBox = document.getElementById("message");
+
+  function showMessage(msg, type = "error") {
+    messageBox.className = type;
+    messageBox.textContent = msg;
+  }
+
+  function clearMessage() {
+    messageBox.textContent = "";
+    messageBox.className = "";
+  }
+
+  async function loadServers() {
+    clearMessage();
+
+    const { data, error } = await client
+      .from("servers")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      showMessage("Load error: " + error.message);
+      return;
     }
 
-    function clearMessage() {
-      messageBox.className = "";
-      messageBox.textContent = "";
+    list.innerHTML = "";
+
+    if (!data.length) {
+      list.innerHTML = "<p>No servers yet</p>";
+      return;
     }
 
-    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    data.forEach(s => {
+      list.innerHTML += `
+        <div class="server">
+          <strong>${s.server_name}</strong><br>
+          Code: ${s.invite_code}
+        </div>
+      `;
+    });
+  }
 
-    async function loadServers() {
-      clearMessage();
+  async function addServer() {
+    const name = nameInput.value.trim();
+    const code = codeInput.value.trim();
 
-      const { data, error } = await client
-        .from("servers")
-        .select("*")
-        .eq("status", "live")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        showMessage("Load error: " + error.message);
-        list.innerHTML = "";
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        list.innerHTML = "<p>No servers posted yet.</p>";
-        return;
-      }
-
-      list.innerHTML = "";
-
-      data.forEach((server) => {
-        const div = document.createElement("div");
-        div.className = "server";
-        div.innerHTML = `
-          <div class="server-name">${server.server_name}</div>
-          <div class="server-code">Code: ${server.invite_code}</div>
-        `;
-        list.appendChild(div);
-      });
+    if (!name || !code) {
+      showMessage("Fill in both fields");
+      return;
     }
 
-    async function addServer() {
-      const serverName = nameInput.value.trim();
-      const inviteCode = codeInput.value.trim();
+    clearMessage();
 
-      if (!serverName || !inviteCode) {
-        showMessage("Fill in both fields.");
-        return;
-      }
+    // 🚫 Prevent duplicate invite codes
+    const { data: existing } = await client
+      .from("servers")
+      .select("*")
+      .eq("invite_code", code);
 
-      clearMessage();
-
-      const { error } = await client
-        .from("servers")
-        .insert([
-          {
-            server_name: serverName,
-            invite_code: inviteCode,
-            status: "live"
-          }
-        ]);
-
-      if (error) {
-        showMessage("Post error: " + error.message);
-        return;
-      }
-
-      showMessage("Server posted.", "success");
-      nameInput.value = "";
-      codeInput.value = "";
-
-      await loadServers();
+    if (existing && existing.length > 0) {
+      showMessage("That invite code already exists");
+      return;
     }
 
-    postBtn.addEventListener("click", addServer);
+    const { error } = await client
+      .from("servers")
+      .insert([
+        { server_name: name, invite_code: code, status: "live" }
+      ]);
+
+    if (error) {
+      showMessage("Post error: " + error.message);
+      return;
+    }
+
+    showMessage("Server posted!", "success");
+
+    nameInput.value = "";
+    codeInput.value = "";
 
     loadServers();
-  </script>
+  }
+
+  postBtn.onclick = addServer;
+
+  loadServers();
+</script>
+
 </body>
 </html>
