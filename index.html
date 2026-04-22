@@ -1,72 +1,48 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Windrose Server Finder</title>
-  <style>
-    body {
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    input, button {
-      padding: 10px;
-      margin: 5px 0;
-      display: block;
-      width: 100%;
-      max-width: 320px;
-    }
-    .server {
-      border: 1px solid #333;
-      padding: 10px;
-      margin-top: 10px;
-      max-width: 500px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Windrose Server Finder</h1>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-  <h2>Post Server</h2>
-  <input id="name" placeholder="Server Name">
-  <input id="code" placeholder="Invite Code">
-  <button onclick="addServer()">Post</button>
+<script>
+const supabase = supabase.createClient(
+  "https://yfizfzllysjuglaywsdn.supabase.co",
+  "PASTE_YOUR_ANON_KEY_HERE"
+)
 
-  <h2>Servers</h2>
-  <div id="list"></div>
+async function addServer() {
+  const name = document.getElementById("name").value.trim()
+  const code = document.getElementById("code").value.trim()
 
-  <script>
-    let servers = [];
+  if (!name || !code) {
+    alert("Fill everything")
+    return
+  }
 
-    function addServer() {
-      const name = document.getElementById("name").value.trim();
-      const code = document.getElementById("code").value.trim();
+  const { error } = await supabase
+    .from('servers')
+    .insert([{ server_name: name, invite_code: code }])
 
-      if (!name || !code) {
-        alert("Fill everything");
-        return;
-      }
+  if (error) {
+    alert("Error: " + error.message)
+  } else {
+    loadServers()
+  }
+}
 
-      servers.push({ name, code });
-      render();
+async function loadServers() {
+  const { data } = await supabase
+    .from('servers')
+    .select('*')
 
-      document.getElementById("name").value = "";
-      document.getElementById("code").value = "";
-    }
+  const list = document.getElementById("list")
+  list.innerHTML = ""
 
-    function render() {
-      const list = document.getElementById("list");
-      list.innerHTML = "";
+  data.forEach(s => {
+    list.innerHTML += `
+      <div class="server">
+        <b>${s.server_name}</b><br>
+        Code: ${s.invite_code}
+      </div>
+    `
+  })
+}
 
-      servers.forEach(s => {
-        list.innerHTML += `
-          <div class="server">
-            <b>${s.name}</b><br>
-            Code: ${s.code}
-          </div>
-        `;
-      });
-    }
-  </script>
-</body>
-</html>
+loadServers()
+</script>
