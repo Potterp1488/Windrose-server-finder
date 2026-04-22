@@ -1,454 +1,910 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Windrose Server Finder</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Windrose Server Finder</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121933;
+      --panel-2: #182142;
+      --border: rgba(255,255,255,0.08);
+      --text: #eef2ff;
+      --muted: #aab4d6;
+      --accent: #6ea8ff;
+      --accent-2: #8b5cf6;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --shadow: 0 18px 45px rgba(0,0,0,0.35);
+      --radius: 18px;
+    }
 
-<style>
-  * {
-    box-sizing: border-box;
-  }
+    * { box-sizing: border-box; }
 
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(180deg, #0b0b10 0%, #11111a 100%);
-    color: white;
-    min-height: 100vh;
-  }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(110,168,255,0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(139,92,246,0.14), transparent 25%),
+        var(--bg);
+      color: var(--text);
+    }
 
-  .container {
-    max-width: 950px;
-    margin: 0 auto;
-    padding: 40px 20px 60px;
-  }
+    a { color: inherit; text-decoration: none; }
 
-  .badge {
-    display: inline-block;
-    margin-bottom: 16px;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: rgba(124, 92, 255, 0.18);
-    border: 1px solid rgba(124, 92, 255, 0.35);
-    color: #d8ccff;
-    font-size: 13px;
-    font-weight: 700;
-  }
+    .wrap {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 80px;
+    }
 
-  h1 {
-    font-size: 54px;
-    margin: 0 0 10px;
-  }
+    .hero {
+      background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
 
-  .subtitle {
-    color: #b8b8c9;
-    margin: 0 0 28px;
-    font-size: 18px;
-  }
+    .hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
 
-  .panel {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 18px;
-    padding: 24px;
-    margin-bottom: 22px;
-    box-shadow: 0 14px 40px rgba(0,0,0,0.28);
-  }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
-  h2 {
-    margin-top: 0;
-    margin-bottom: 16px;
-    font-size: 30px;
-  }
+    .logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+    }
 
-  .search-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 12px;
-    align-items: center;
-  }
-
-  input, textarea {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 12px;
-    border: 1px solid #2f2f3d;
-    background: #171721;
-    color: #fff;
-    font-size: 16px;
-    outline: none;
-    margin-bottom: 12px;
-  }
-
-  input::placeholder,
-  textarea::placeholder {
-    color: #9f9fb2;
-  }
-
-  textarea {
-    min-height: 90px;
-    resize: vertical;
-  }
-
-  button, .toggle-link {
-    border: none;
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    color: white;
-    background: linear-gradient(135deg, #7c5cff, #29d3ff);
-    text-decoration: none;
-    display: inline-block;
-  }
-
-  .toggle-link {
-    white-space: nowrap;
-  }
-
-  .toggle-link.secondary {
-    background: #222233;
-    border: 1px solid #35354a;
-  }
-
-  .form-hidden {
-    display: none;
-  }
-
-  .server-list {
-    display: grid;
-    gap: 14px;
-  }
-
-  .server-card {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    align-items: flex-start;
-    background: #15151f;
-    border: 1px solid #2d2d3a;
-    border-radius: 16px;
-    padding: 18px;
-  }
-
-  .server-name {
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 8px;
-  }
-
-  .server-meta {
-    color: #c9c9da;
-    font-size: 15px;
-    line-height: 1.6;
-  }
-
-  .copy-btn {
-    width: auto;
-    min-width: 110px;
-    padding: 12px 16px;
-    background: #222233;
-    border: 1px solid #35354a;
-    border-radius: 12px;
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .message {
-    min-height: 22px;
-    font-size: 15px;
-    font-weight: 700;
-    margin-top: 8px;
-  }
-
-  .error {
-    color: #ff7f7f;
-  }
-
-  .success {
-    color: #7df0a8;
-  }
-
-  .checkbox-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 8px 0 12px;
-  }
-
-  .checkbox-row input {
-    width: auto;
-    margin: 0;
-  }
-
-  .empty-state {
-    color: #aaaabc;
-  }
-
-  @media (max-width: 700px) {
     h1 {
-      font-size: 40px;
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn,
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .btn,
+    button[type="submit"],
+    .search-btn,
+    .copy-btn,
+    .clear-btn,
+    .toggle-btn,
+    .invite-link {
+      border: 0;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: 0.2s ease;
+    }
+
+    .btn,
+    button[type="submit"],
+    .search-btn,
+    .toggle-btn,
+    .invite-link {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      padding: 12px 16px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover,
+    button[type="submit"]:hover,
+    .search-btn:hover,
+    .toggle-btn:hover,
+    .invite-link:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .btn.secondary,
+    .clear-btn,
+    .copy-btn {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+    }
+
+    .search-panel,
+    .post-panel,
+    .stats-panel {
+      background: rgba(18, 25, 51, 0.82);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .stats-panel {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.035);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 18px;
+      align-items: start;
     }
 
     .search-row {
-      grid-template-columns: 1fr;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .search-row input,
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 14px;
+      outline: none;
+    }
+
+    .field textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    .search-row input:focus,
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: rgba(110,168,255,0.7);
+      box-shadow: 0 0 0 3px rgba(110,168,255,0.15);
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag-chip {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 13px;
+      transition: 0.18s ease;
+    }
+
+    .tag-chip:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .tag-chip.active {
+      background: linear-gradient(135deg, rgba(110,168,255,0.24), rgba(139,92,246,0.24));
+      border-color: rgba(110,168,255,0.4);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 160px 160px;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .server-list {
+      display: grid;
+      gap: 14px;
     }
 
     .server-card {
-      flex-direction: column;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.025));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      transition: 0.2s ease;
     }
 
-    .copy-btn {
-      width: 100%;
+    .server-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(110,168,255,0.35);
     }
-  }
-</style>
+
+    .server-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+
+    .server-name {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 4px;
+    }
+
+    .server-desc {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .server-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .badge {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .badge.good {
+      border-color: rgba(34,197,94,0.4);
+      color: #d8ffe4;
+      background: rgba(34,197,94,0.12);
+    }
+
+    .server-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .server-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .invite-code {
+      color: var(--muted);
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      margin: 0 0 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    .status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .status.show { display: block; }
+    .status.success {
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.35);
+      color: #dcffe8;
+    }
+    .status.error {
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.35);
+      color: #ffe0e0;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 28px 16px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 950px) {
+      .grid,
+      .toolbar,
+      .stats-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .wrap {
+        width: min(100%, calc(100% - 20px));
+      }
+
+      .hero,
+      .search-panel,
+      .post-panel,
+      .stats-panel {
+        padding: 14px;
+      }
+
+      .search-row {
+        grid-template-columns: 1fr;
+      }
+
+      .server-top {
+        flex-direction: column;
+      }
+
+      .server-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="badge">Unofficial Community Directory</div>
-    <h1>Windrose Server Finder</h1>
-    <p class="subtitle">Search servers first. Post yours when you're ready.</p>
-
-    <div class="panel">
-      <h2>Find Servers</h2>
-
-      <div class="search-row">
-        <input id="searchInput" placeholder="Search by server name, invite code, region, style, or description" />
-        <button id="togglePostBtn" class="toggle-link">Post a Server</button>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-top">
+        <div class="brand">
+          <div class="logo">W</div>
+          <div>
+            <h1>Windrose Server Finder</h1>
+            <p class="sub">Discover, search, and post multiplayer servers in one clean place.</p>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a href="#servers" class="btn">Browse Servers</a>
+          <a href="#postServer" class="btn secondary">Post a Server</a>
+        </div>
       </div>
+    </section>
+
+    <section class="stats-panel">
+      <div class="stat">
+        <div class="stat-label">Total Servers</div>
+        <div class="stat-value" id="totalServers">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Filtered Results</div>
+        <div class="stat-value" id="filteredServers">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Selected Tags</div>
+        <div class="stat-value" id="selectedTagsCount">0</div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="search-panel" id="servers">
+        <div class="panel-head">
+          <h2 class="section-title">Find a Server</h2>
+          <button class="toggle-btn" id="refreshBtn" type="button">Refresh</button>
+        </div>
+
+        <div class="search-row">
+          <input id="searchInput" type="text" placeholder="Search by name, description, tag, or invite code" />
+          <button id="searchBtn" class="search-btn" type="button">Search</button>
+        </div>
+
+        <div class="filters-bar">
+          <strong>Quick Tags</strong>
+          <button id="clearFiltersBtn" class="clear-btn" type="button">Clear Filters</button>
+        </div>
+
+        <div id="tagFilters" class="tag-list"></div>
+
+        <div class="toolbar">
+          <select id="sortSelect">
+            <option value="newest">Sort: Newest</option>
+            <option value="name_asc">Sort: Name A-Z</option>
+            <option value="name_desc">Sort: Name Z-A</option>
+          </select>
+
+          <select id="moddedFilter">
+            <option value="all">All Servers</option>
+            <option value="modded">Modded Only</option>
+            <option value="vanilla">Vanilla Only</option>
+          </select>
+
+          <select id="playersFilter">
+            <option value="all">Any Player Count</option>
+            <option value="small">1-25 Max</option>
+            <option value="medium">26-64 Max</option>
+            <option value="large">65+ Max</option>
+          </select>
+        </div>
+
+        <div id="serverList" class="server-list"></div>
+      </section>
+
+      <section class="post-panel" id="postServer">
+        <div class="panel-head">
+          <h2 class="section-title">Post Your Server</h2>
+        </div>
+
+        <form id="serverForm">
+          <div class="field-grid">
+            <div class="field">
+              <label for="name">Server Name</label>
+              <input id="name" name="name" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="description">Description</label>
+              <textarea id="description" name="description" placeholder="What makes your server stand out?"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="invite_code">Invite Code</label>
+              <input id="invite_code" name="invite_code" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="max_players">Max Player Count</label>
+              <input id="max_players" name="max_players" type="number" min="1" placeholder="Example: 64" />
+            </div>
+
+            <div class="field">
+              <label for="modded">Server Type</label>
+              <select id="modded" name="modded">
+                <option value="true">Modded</option>
+                <option value="false">Vanilla</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="tags">Tags</label>
+              <input id="tags" name="tags" type="text" placeholder="pvp, casual, survival" />
+              <div class="helper">Separate tags with commas.</div>
+            </div>
+
+            <button type="submit">Post Server</button>
+          </div>
+        </form>
+
+        <div id="formStatus" class="status"></div>
+      </section>
     </div>
 
-    <div id="postPanel" class="panel form-hidden">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
-        <h2 style="margin-bottom:0;">Post Server</h2>
-        <button id="closePostBtn" class="toggle-link secondary" type="button">Close</button>
-      </div>
-
-      <div style="margin-top:16px;">
-        <input id="name" placeholder="Server Name" />
-        <input id="code" placeholder="Invite Code" />
-        <input id="region" placeholder="Region (NA, EU, etc.)" />
-        <input id="playStyle" placeholder="Play Style (PvP, PvE, Mixed)" />
-        <input id="maxPlayers" placeholder="Max Players" />
-        <input id="discordUrl" placeholder="Discord URL" />
-        <textarea id="description" placeholder="Short Description"></textarea>
-
-        <label class="checkbox-row">
-          <input id="isModded" type="checkbox" />
-          <span>Modded Server</span>
-        </label>
-
-        <button id="postBtn">Post Server</button>
-        <div id="message" class="message"></div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>Servers</h2>
-      <div id="list" class="server-list">Loading...</div>
-    </div>
+    <div class="footer-note">Built for simple static hosting with Supabase + Vercel.</div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://yfizfzllysjuglaywsdn.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
+    // =========================
+    // SUPABASE SETUP
+    // =========================
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+    const TABLE_NAME = "servers";
 
     const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const list = document.getElementById("list");
-    const messageBox = document.getElementById("message");
-    const searchInput = document.getElementById("searchInput");
-
-    const togglePostBtn = document.getElementById("togglePostBtn");
-    const closePostBtn = document.getElementById("closePostBtn");
-    const postPanel = document.getElementById("postPanel");
-
-    const nameInput = document.getElementById("name");
-    const codeInput = document.getElementById("code");
-    const regionInput = document.getElementById("region");
-    const playStyleInput = document.getElementById("playStyle");
-    const maxPlayersInput = document.getElementById("maxPlayers");
-    const discordUrlInput = document.getElementById("discordUrl");
-    const descriptionInput = document.getElementById("description");
-    const isModdedInput = document.getElementById("isModded");
-    const postBtn = document.getElementById("postBtn");
-
+    // =========================
+    // STATE
+    // =========================
     let allServers = [];
+    let filteredServers = [];
+    let activeTags = new Set();
+    let currentSearch = "";
 
-    function showMessage(text, type = "error") {
-      messageBox.className = "message " + type;
-      messageBox.textContent = text;
+    // =========================
+    // ELEMENTS
+    // =========================
+    const serverListEl = document.getElementById("serverList");
+    const tagFiltersEl = document.getElementById("tagFilters");
+    const searchInputEl = document.getElementById("searchInput");
+    const searchBtnEl = document.getElementById("searchBtn");
+    const clearFiltersBtnEl = document.getElementById("clearFiltersBtn");
+    const sortSelectEl = document.getElementById("sortSelect");
+    const moddedFilterEl = document.getElementById("moddedFilter");
+    const playersFilterEl = document.getElementById("playersFilter");
+    const refreshBtnEl = document.getElementById("refreshBtn");
+
+    const totalServersEl = document.getElementById("totalServers");
+    const filteredServersEl = document.getElementById("filteredServers");
+    const selectedTagsCountEl = document.getElementById("selectedTagsCount");
+
+    const serverFormEl = document.getElementById("serverForm");
+    const formStatusEl = document.getElementById("formStatus");
+
+    // =========================
+    // HELPERS
+    // =========================
+    function normalizeTags(tags) {
+      if (!tags) return [];
+      if (Array.isArray(tags)) {
+        return tags.map(t => String(t).trim().toLowerCase()).filter(Boolean);
+      }
+      return String(tags)
+        .split(",")
+        .map(t => t.trim().toLowerCase())
+        .filter(Boolean);
     }
 
-    function clearMessage() {
-      messageBox.className = "message";
-      messageBox.textContent = "";
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    function escapeHtml(value) {
-      return String(value || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    function titleCase(text) {
+      return String(text)
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
     }
 
-    function renderServers(servers) {
-      if (!servers || servers.length === 0) {
-        list.innerHTML = '<div class="empty-state">No matching servers found.</div>';
+    function showStatus(message, type = "success") {
+      formStatusEl.textContent = message;
+      formStatusEl.className = `status show ${type}`;
+    }
+
+    function updateStats() {
+      totalServersEl.textContent = allServers.length;
+      filteredServersEl.textContent = filteredServers.length;
+      selectedTagsCountEl.textContent = activeTags.size;
+    }
+
+    function getAllTags(servers) {
+      const tagSet = new Set();
+      servers.forEach(server => {
+        normalizeTags(server.tags).forEach(tag => tagSet.add(tag));
+      });
+      return [...tagSet].sort((a, b) => a.localeCompare(b));
+    }
+
+    function serverMatchesPlayersFilter(server, filterValue) {
+      const maxPlayers = Number(server.max_players || 0);
+      if (filterValue === "all") return true;
+      if (filterValue === "small") return maxPlayers >= 1 && maxPlayers <= 25;
+      if (filterValue === "medium") return maxPlayers >= 26 && maxPlayers <= 64;
+      if (filterValue === "large") return maxPlayers >= 65;
+      return true;
+    }
+
+    function applyFilters() {
+      const search = currentSearch.trim().toLowerCase();
+      const moddedFilter = moddedFilterEl.value;
+      const playersFilter = playersFilterEl.value;
+      const sortValue = sortSelectEl.value;
+
+      filteredServers = allServers.filter(server => {
+        const tags = normalizeTags(server.tags);
+        const searchableText = [
+          server.name,
+          server.description,
+          server.invite_code,
+          tags.join(" ")
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = !search || searchableText.includes(search);
+        const matchesTags = activeTags.size === 0 || [...activeTags].every(tag => tags.includes(tag));
+
+        let matchesModded = true;
+        if (moddedFilter === "modded") matchesModded = !!server.modded;
+        if (moddedFilter === "vanilla") matchesModded = !server.modded;
+
+        const matchesPlayers = serverMatchesPlayersFilter(server, playersFilter);
+
+        return matchesSearch && matchesTags && matchesModded && matchesPlayers;
+      });
+
+      filteredServers.sort((a, b) => {
+        if (sortValue === "name_asc") return String(a.name || "").localeCompare(String(b.name || ""));
+        if (sortValue === "name_desc") return String(b.name || "").localeCompare(String(a.name || ""));
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      });
+
+      renderServers();
+      updateStats();
+    }
+
+    function renderTagFilters() {
+      const tags = getAllTags(allServers);
+
+      if (tags.length === 0) {
+        tagFiltersEl.innerHTML = '<div class="helper">No tags found yet.</div>';
         return;
       }
 
-      list.innerHTML = "";
+      tagFiltersEl.innerHTML = tags.map(tag => `
+        <button class="tag-chip ${activeTags.has(tag) ? "active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
+          ${escapeHtml(titleCase(tag))}
+        </button>
+      `).join("");
 
-      servers.forEach((server) => {
-        const safeName = escapeHtml(server.server_name || "Unnamed Server");
-        const safeCode = escapeHtml(server.invite_code || "");
-        const safeRegion = escapeHtml(server.region || "N/A");
-        const safeStyle = escapeHtml(server.play_style || "N/A");
-        const safeDiscord = escapeHtml(server.discord_url || "N/A");
-        const safeDescription = escapeHtml(server.description || "No description");
-        const safePlayers = server.max_players ?? "?";
-
-        const div = document.createElement("div");
-        div.className = "server-card";
-        div.innerHTML = `
-          <div>
-            <div class="server-name">${safeName}</div>
-            <div class="server-meta">
-              Code: ${safeCode}<br>
-              Max Players: ${safePlayers}<br>
-              Region: ${safeRegion}<br>
-              Style: ${safeStyle}<br>
-              Type: ${server.is_modded ? "Modded" : "Vanilla"}<br>
-              Discord: ${safeDiscord}<br>
-              Description: ${safeDescription}
-            </div>
-          </div>
-          <button class="copy-btn" data-code="${safeCode}">Copy Code</button>
-        `;
-        list.appendChild(div);
-      });
-
-      document.querySelectorAll(".copy-btn").forEach((button) => {
-        button.addEventListener("click", async () => {
-          const code = button.getAttribute("data-code");
-          try {
-            await navigator.clipboard.writeText(code);
-            const oldText = button.textContent;
-            button.textContent = "Copied";
-            setTimeout(() => {
-              button.textContent = oldText;
-            }, 1000);
-          } catch {
-            alert("Could not copy code");
+      tagFiltersEl.querySelectorAll(".tag-chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tag = btn.dataset.tag;
+          if (activeTags.has(tag)) {
+            activeTags.delete(tag);
+          } else {
+            activeTags.add(tag);
           }
+          renderTagFilters();
+          applyFilters();
         });
       });
     }
 
-    function filterServers() {
-      const term = searchInput.value.trim().toLowerCase();
-
-      if (!term) {
-        renderServers(allServers);
+    function renderServers() {
+      if (!filteredServers.length) {
+        serverListEl.innerHTML = `
+          <div class="empty">
+            <strong>No servers found.</strong>
+            <div style="margin-top:8px;">Try clearing filters or changing your search.</div>
+          </div>
+        `;
         return;
       }
 
-      const filtered = allServers.filter((server) => {
-        return [
-          server.server_name,
-          server.invite_code,
-          server.region,
-          server.play_style,
-          server.description,
-          server.discord_url,
-          server.is_modded ? "modded" : "vanilla"
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(term);
+      serverListEl.innerHTML = filteredServers.map(server => {
+        const tags = normalizeTags(server.tags);
+        const inviteCode = escapeHtml(server.invite_code || "");
+        const serverName = escapeHtml(server.name || "Untitled Server");
+        const desc = escapeHtml(server.description || "No description provided.");
+        const maxPlayers = server.max_players ? `${escapeHtml(server.max_players)} Max Players` : "No Player Limit Set";
+        const moddedLabel = server.modded ? "Modded" : "Vanilla";
+        const createdAt = server.created_at ? new Date(server.created_at).toLocaleDateString() : "Unknown";
+
+        return `
+          <article class="server-card">
+            <div class="server-top">
+              <div>
+                <h3 class="server-name">${serverName}</h3>
+                <p class="server-desc">${desc}</p>
+              </div>
+              <div class="badge good">${escapeHtml(moddedLabel)}</div>
+            </div>
+
+            <div class="server-badges">
+              <div class="badge">${escapeHtml(maxPlayers)}</div>
+              <div class="badge">Posted ${escapeHtml(createdAt)}</div>
+            </div>
+
+            <div class="server-tags">
+              ${tags.length ? tags.map(tag => `<button class="tag-chip ${activeTags.has(tag) ? "active" : ""}" type="button" data-server-tag="${escapeHtml(tag)}">${escapeHtml(titleCase(tag))}</button>`).join("") : '<span class="badge">No Tags</span>'}
+            </div>
+
+            <div class="server-actions">
+              <button class="copy-btn" type="button" data-copy="${inviteCode}">Copy Invite Code</button>
+              <div class="invite-code">Invite Code: <strong>${inviteCode}</strong></div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      serverListEl.querySelectorAll("[data-copy]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const code = btn.dataset.copy;
+          try {
+            await navigator.clipboard.writeText(code);
+            const original = btn.textContent;
+            btn.textContent = "Copied";
+            setTimeout(() => btn.textContent = original, 1200);
+          } catch {
+            alert("Could not copy invite code.");
+          }
+        });
       });
 
-      renderServers(filtered);
+      serverListEl.querySelectorAll("[data-server-tag]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tag = btn.dataset.serverTag;
+          if (activeTags.has(tag)) {
+            activeTags.delete(tag);
+          } else {
+            activeTags.add(tag);
+          }
+          renderTagFilters();
+          applyFilters();
+        });
+      });
     }
 
+    // =========================
+    // SUPABASE ACTIONS
+    // =========================
     async function loadServers() {
+      serverListEl.innerHTML = '<div class="empty">Loading servers...</div>';
+
       const { data, error } = await client
-        .from("servers")
+        .from(TABLE_NAME)
         .select("*")
         .order("created_at", { ascending: false });
 
       if (error) {
-        list.innerHTML = "Error loading servers";
+        console.error(error);
+        serverListEl.innerHTML = '<div class="empty">Could not load servers. Check Supabase settings.</div>';
         return;
       }
 
-      allServers = data || [];
-      filterServers();
+      allServers = Array.isArray(data) ? data : [];
+      renderTagFilters();
+      applyFilters();
     }
 
-    async function addServer() {
-      clearMessage();
+    async function createServer(event) {
+      event.preventDefault();
+      showStatus("Posting server...", "success");
 
-      if (!nameInput.value.trim() || !codeInput.value.trim()) {
-        showMessage("Server name and invite code are required.");
+      const formData = new FormData(serverFormEl);
+      const payload = {
+        name: String(formData.get("name") || "").trim(),
+        description: String(formData.get("description") || "").trim(),
+        invite_code: String(formData.get("invite_code") || "").trim(),
+        max_players: formData.get("max_players") ? Number(formData.get("max_players")) : null,
+        modded: String(formData.get("modded")) === "true",
+        tags: normalizeTags(formData.get("tags"))
+      };
+
+      if (!payload.name || !payload.invite_code) {
+        showStatus("Server name and invite code are required.", "error");
         return;
       }
 
-      const payload = {
-        server_name: nameInput.value.trim(),
-        invite_code: codeInput.value.trim(),
-        region: regionInput.value.trim() || null,
-        play_style: playStyleInput.value.trim() || null,
-        max_players: maxPlayersInput.value ? parseInt(maxPlayersInput.value, 10) : null,
-        discord_url: discordUrlInput.value.trim() || null,
-        description: descriptionInput.value.trim() || null,
-        is_modded: isModdedInput.checked,
-        status: "live"
-      };
-
       const { error } = await client
-        .from("servers")
+        .from(TABLE_NAME)
         .insert([payload]);
 
       if (error) {
-        showMessage("Error posting");
+        console.error(error);
+        showStatus("Could not post server. Check your table columns and RLS rules.", "error");
         return;
       }
 
-      showMessage("Server posted.", "success");
-
-      nameInput.value = "";
-      codeInput.value = "";
-      regionInput.value = "";
-      playStyleInput.value = "";
-      maxPlayersInput.value = "";
-      discordUrlInput.value = "";
-      descriptionInput.value = "";
-      isModdedInput.checked = false;
-
+      serverFormEl.reset();
+      showStatus("Server posted successfully.", "success");
       await loadServers();
-      postPanel.classList.add("form-hidden");
     }
 
-    togglePostBtn.addEventListener("click", () => {
-      postPanel.classList.toggle("form-hidden");
+    // =========================
+    // EVENTS
+    // =========================
+    searchBtnEl.addEventListener("click", () => {
+      currentSearch = searchInputEl.value;
+      applyFilters();
     });
 
-    closePostBtn.addEventListener("click", () => {
-      postPanel.classList.add("form-hidden");
+    searchInputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        currentSearch = searchInputEl.value;
+        applyFilters();
+      }
     });
 
-    postBtn.addEventListener("click", addServer);
-    searchInput.addEventListener("input", filterServers);
+    clearFiltersBtnEl.addEventListener("click", () => {
+      activeTags.clear();
+      currentSearch = "";
+      searchInputEl.value = "";
+      sortSelectEl.value = "newest";
+      moddedFilterEl.value = "all";
+      playersFilterEl.value = "all";
+      renderTagFilters();
+      applyFilters();
+    });
 
+    sortSelectEl.addEventListener("change", applyFilters);
+    moddedFilterEl.addEventListener("change", applyFilters);
+    playersFilterEl.addEventListener("change", applyFilters);
+    refreshBtnEl.addEventListener("click", loadServers);
+    serverFormEl.addEventListener("submit", createServer);
+
+    // =========================
+    // START
+    // =========================
     loadServers();
   </script>
 </body>
