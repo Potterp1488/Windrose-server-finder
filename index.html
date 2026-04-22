@@ -6,204 +6,450 @@
 <title>Windrose Server Finder</title>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: white;
-  padding: 40px;
-}
+  * {
+    box-sizing: border-box;
+  }
 
-h1 {
-  text-align: center;
-}
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #0b0b10 0%, #11111a 100%);
+    color: white;
+    min-height: 100vh;
+  }
 
-.container {
-  max-width: 700px;
-  margin: auto;
-}
+  .container {
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+  }
 
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 6px 0;
-  border-radius: 6px;
-  border: none;
-}
+  .badge {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(124, 92, 255, 0.18);
+    border: 1px solid rgba(124, 92, 255, 0.35);
+    color: #d8ccff;
+    font-size: 13px;
+    font-weight: 700;
+  }
 
-button {
-  padding: 12px;
-  width: 100%;
-  margin-top: 10px;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(45deg, purple, cyan);
-  color: white;
-  cursor: pointer;
-}
+  h1 {
+    font-size: 54px;
+    margin: 0 0 10px;
+  }
 
-.server-card {
-  background: #1e293b;
-  padding: 15px;
-  margin-top: 15px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  .subtitle {
+    color: #b8b8c9;
+    margin: 0 0 28px;
+    font-size: 18px;
+  }
 
-.copy-btn {
-  padding: 8px;
-  border-radius: 6px;
-  background: #6366f1;
-  border: none;
-  color: white;
-  cursor: pointer;
-}
+  .panel {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.28);
+  }
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 30px;
+  }
+
+  .search-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #2f2f3d;
+    background: #171721;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    margin-bottom: 12px;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #9f9fb2;
+  }
+
+  textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+
+  button, .toggle-link {
+    border: none;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    color: white;
+    background: linear-gradient(135deg, #7c5cff, #29d3ff);
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .toggle-link {
+    white-space: nowrap;
+  }
+
+  .toggle-link.secondary {
+    background: #222233;
+    border: 1px solid #35354a;
+  }
+
+  .form-hidden {
+    display: none;
+  }
+
+  .server-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .server-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: flex-start;
+    background: #15151f;
+    border: 1px solid #2d2d3a;
+    border-radius: 16px;
+    padding: 18px;
+  }
+
+  .server-name {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .server-meta {
+    color: #c9c9da;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .copy-btn {
+    width: auto;
+    min-width: 110px;
+    padding: 12px 16px;
+    background: #222233;
+    border: 1px solid #35354a;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .message {
+    min-height: 22px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 8px;
+  }
+
+  .error {
+    color: #ff7f7f;
+  }
+
+  .success {
+    color: #7df0a8;
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0 12px;
+  }
+
+  .checkbox-row input {
+    width: auto;
+    margin: 0;
+  }
+
+  .empty-state {
+    color: #aaaabc;
+  }
+
+  @media (max-width: 700px) {
+    h1 {
+      font-size: 40px;
+    }
+
+    .search-row {
+      grid-template-columns: 1fr;
+    }
+
+    .server-card {
+      flex-direction: column;
+    }
+
+    .copy-btn {
+      width: 100%;
+    }
+  }
 </style>
 </head>
-
 <body>
-<div class="container">
+  <div class="container">
+    <div class="badge">Unofficial Community Directory</div>
+    <h1>Windrose Server Finder</h1>
+    <p class="subtitle">Search servers first. Post yours when you're ready.</p>
 
-<h1>Windrose Server Finder</h1>
+    <div class="panel">
+      <h2>Find Servers</h2>
 
-<h2>Post Server</h2>
-
-<input id="name" placeholder="Server Name" />
-<input id="code" placeholder="Invite Code" />
-
-<input id="region" placeholder="Region (NA, EU, etc.)" />
-<input id="playStyle" placeholder="Play Style (PvP, PvE, Mixed)" />
-
-<input id="maxPlayers" placeholder="Max Players" />
-<input id="currentPlayers" placeholder="Current Players" />
-
-<input id="discordUrl" placeholder="Discord URL" />
-<input id="description" placeholder="Short Description" />
-
-<label style="display:flex; gap:10px; align-items:center;">
-  <input id="isModded" type="checkbox" style="width:auto;" />
-  Modded Server
-</label>
-
-<button id="postBtn">Post Server</button>
-
-<div id="message"></div>
-
-<h2>Servers</h2>
-<div id="list">Loading...</div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-
-const SUPABASE_URL = "https://yfizfzillysjuglaywsdn.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
-
-const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// inputs
-const nameInput = document.getElementById("name");
-const codeInput = document.getElementById("code");
-const regionInput = document.getElementById("region");
-const playStyleInput = document.getElementById("playStyle");
-const maxPlayersInput = document.getElementById("maxPlayers");
-const currentPlayersInput = document.getElementById("currentPlayers");
-const discordUrlInput = document.getElementById("discordUrl");
-const descriptionInput = document.getElementById("description");
-const isModdedInput = document.getElementById("isModded");
-
-const postBtn = document.getElementById("postBtn");
-const list = document.getElementById("list");
-const messageBox = document.getElementById("message");
-
-// load servers
-async function loadServers() {
-  list.innerHTML = "Loading...";
-
-  const { data, error } = await client
-    .from("servers")
-    .select("*")
-    .eq("status", "live")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    list.innerHTML = "Error loading servers";
-    return;
-  }
-
-  list.innerHTML = "";
-
-  data.forEach(server => {
-    const div = document.createElement("div");
-    div.className = "server-card";
-
-    div.innerHTML = `
-      <div>
-        <strong>${server.server_name}</strong><br>
-        Code: ${server.invite_code}<br>
-        Players: ${server.current_players ?? 0} / ${server.max_players ?? "?"}<br>
-        Region: ${server.region || "N/A"}<br>
-        Style: ${server.play_style || "N/A"}<br>
-        Type: ${server.is_modded ? "Modded" : "Vanilla"}<br>
-        Discord: ${server.discord_url || "N/A"}<br>
-        ${server.description || ""}
+      <div class="search-row">
+        <input id="searchInput" placeholder="Search by server name, invite code, region, style, or description" />
+        <button id="togglePostBtn" class="toggle-link">Post a Server</button>
       </div>
-      <button class="copy-btn" onclick="navigator.clipboard.writeText('${server.invite_code}')">
-        Copy Code
-      </button>
-    `;
+    </div>
 
-    list.appendChild(div);
-  });
-}
+    <div id="postPanel" class="panel form-hidden">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+        <h2 style="margin-bottom:0;">Post Server</h2>
+        <button id="closePostBtn" class="toggle-link secondary" type="button">Close</button>
+      </div>
 
-// post server
-postBtn.onclick = async () => {
+      <div style="margin-top:16px;">
+        <input id="name" placeholder="Server Name" />
+        <input id="code" placeholder="Invite Code" />
+        <input id="region" placeholder="Region (NA, EU, etc.)" />
+        <input id="playStyle" placeholder="Play Style (PvP, PvE, Mixed)" />
+        <input id="maxPlayers" placeholder="Max Players" />
+        <input id="discordUrl" placeholder="Discord URL" />
+        <textarea id="description" placeholder="Short Description"></textarea>
 
-  if (!nameInput.value || !codeInput.value) {
-    messageBox.textContent = "Fill required fields";
-    return;
-  }
+        <label class="checkbox-row">
+          <input id="isModded" type="checkbox" />
+          <span>Modded Server</span>
+        </label>
 
-  const { error } = await client.from("servers").insert([
-    {
-      server_name: nameInput.value,
-      invite_code: codeInput.value,
-      region: regionInput.value,
-      play_style: playStyleInput.value,
-      max_players: maxPlayersInput.value ? parseInt(maxPlayersInput.value) : null,
-      current_players: currentPlayersInput.value ? parseInt(currentPlayersInput.value) : null,
-      discord_url: discordUrlInput.value,
-      description: descriptionInput.value,
-      is_modded: isModdedInput.checked,
-      status: "live"
+        <button id="postBtn">Post Server</button>
+        <div id="message" class="message"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Servers</h2>
+      <div id="list" class="server-list">Loading...</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://yfizfzllysjuglaywsdn.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
+
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const list = document.getElementById("list");
+    const messageBox = document.getElementById("message");
+    const searchInput = document.getElementById("searchInput");
+
+    const togglePostBtn = document.getElementById("togglePostBtn");
+    const closePostBtn = document.getElementById("closePostBtn");
+    const postPanel = document.getElementById("postPanel");
+
+    const nameInput = document.getElementById("name");
+    const codeInput = document.getElementById("code");
+    const regionInput = document.getElementById("region");
+    const playStyleInput = document.getElementById("playStyle");
+    const maxPlayersInput = document.getElementById("maxPlayers");
+    const discordUrlInput = document.getElementById("discordUrl");
+    const descriptionInput = document.getElementById("description");
+    const isModdedInput = document.getElementById("isModded");
+    const postBtn = document.getElementById("postBtn");
+
+    let allServers = [];
+
+    function showMessage(text, type = "error") {
+      messageBox.className = "message " + type;
+      messageBox.textContent = text;
     }
-  ]);
 
-  if (error) {
-    messageBox.textContent = "Error posting";
-  } else {
-    messageBox.textContent = "Posted!";
+    function clearMessage() {
+      messageBox.className = "message";
+      messageBox.textContent = "";
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderServers(servers) {
+      if (!servers || servers.length === 0) {
+        list.innerHTML = '<div class="empty-state">No matching servers found.</div>';
+        return;
+      }
+
+      list.innerHTML = "";
+
+      servers.forEach((server) => {
+        const safeName = escapeHtml(server.server_name || "Unnamed Server");
+        const safeCode = escapeHtml(server.invite_code || "");
+        const safeRegion = escapeHtml(server.region || "N/A");
+        const safeStyle = escapeHtml(server.play_style || "N/A");
+        const safeDiscord = escapeHtml(server.discord_url || "N/A");
+        const safeDescription = escapeHtml(server.description || "No description");
+        const safePlayers = server.max_players ?? "?";
+
+        const div = document.createElement("div");
+        div.className = "server-card";
+        div.innerHTML = `
+          <div>
+            <div class="server-name">${safeName}</div>
+            <div class="server-meta">
+              Code: ${safeCode}<br>
+              Max Players: ${safePlayers}<br>
+              Region: ${safeRegion}<br>
+              Style: ${safeStyle}<br>
+              Type: ${server.is_modded ? "Modded" : "Vanilla"}<br>
+              Discord: ${safeDiscord}<br>
+              Description: ${safeDescription}
+            </div>
+          </div>
+          <button class="copy-btn" data-code="${safeCode}">Copy Code</button>
+        `;
+        list.appendChild(div);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const code = button.getAttribute("data-code");
+          try {
+            await navigator.clipboard.writeText(code);
+            const oldText = button.textContent;
+            button.textContent = "Copied";
+            setTimeout(() => {
+              button.textContent = oldText;
+            }, 1000);
+          } catch {
+            alert("Could not copy code");
+          }
+        });
+      });
+    }
+
+    function filterServers() {
+      const term = searchInput.value.trim().toLowerCase();
+
+      if (!term) {
+        renderServers(allServers);
+        return;
+      }
+
+      const filtered = allServers.filter((server) => {
+        return [
+          server.server_name,
+          server.invite_code,
+          server.region,
+          server.play_style,
+          server.description,
+          server.discord_url,
+          server.is_modded ? "modded" : "vanilla"
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(term);
+      });
+
+      renderServers(filtered);
+    }
+
+    async function loadServers() {
+      const { data, error } = await client
+        .from("servers")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        list.innerHTML = "Error loading servers";
+        return;
+      }
+
+      allServers = data || [];
+      filterServers();
+    }
+
+    async function addServer() {
+      clearMessage();
+
+      if (!nameInput.value.trim() || !codeInput.value.trim()) {
+        showMessage("Server name and invite code are required.");
+        return;
+      }
+
+      const payload = {
+        server_name: nameInput.value.trim(),
+        invite_code: codeInput.value.trim(),
+        region: regionInput.value.trim() || null,
+        play_style: playStyleInput.value.trim() || null,
+        max_players: maxPlayersInput.value ? parseInt(maxPlayersInput.value, 10) : null,
+        discord_url: discordUrlInput.value.trim() || null,
+        description: descriptionInput.value.trim() || null,
+        is_modded: isModdedInput.checked,
+        status: "live"
+      };
+
+      const { error } = await client
+        .from("servers")
+        .insert([payload]);
+
+      if (error) {
+        showMessage("Error posting");
+        return;
+      }
+
+      showMessage("Server posted.", "success");
+
+      nameInput.value = "";
+      codeInput.value = "";
+      regionInput.value = "";
+      playStyleInput.value = "";
+      maxPlayersInput.value = "";
+      discordUrlInput.value = "";
+      descriptionInput.value = "";
+      isModdedInput.checked = false;
+
+      await loadServers();
+      postPanel.classList.add("form-hidden");
+    }
+
+    togglePostBtn.addEventListener("click", () => {
+      postPanel.classList.toggle("form-hidden");
+    });
+
+    closePostBtn.addEventListener("click", () => {
+      postPanel.classList.add("form-hidden");
+    });
+
+    postBtn.addEventListener("click", addServer);
+    searchInput.addEventListener("input", filterServers);
+
     loadServers();
-
-    // clear form
-    nameInput.value = "";
-    codeInput.value = "";
-    regionInput.value = "";
-    playStyleInput.value = "";
-    maxPlayersInput.value = "";
-    currentPlayersInput.value = "";
-    discordUrlInput.value = "";
-    descriptionInput.value = "";
-    isModdedInput.checked = false;
-  }
-};
-
-// initial load
-loadServers();
-
-</script>
+  </script>
 </body>
 </html>
