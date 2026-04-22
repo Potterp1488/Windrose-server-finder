@@ -7,94 +7,75 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #0b1020;
-      --panel: #121933;
-      --panel-2: #182142;
-      --border: rgba(255,255,255,0.08);
-      --text: #eef2ff;
-      --muted: #aab4d6;
-      --accent: #6ea8ff;
-      --accent-2: #8b5cf6;
-      --success: #22c55e;
-      --danger: #ef4444;
-      --shadow: 0 18px 45px rgba(0,0,0,0.35);
-      --radius: 18px;
+      --bg: #060d1d;
+      --bg-2: #0a1329;
+      --panel: #0d1832;
+      --panel-2: #101d3b;
+      --border: rgba(119, 146, 213, 0.18);
+      --text: #f4f7ff;
+      --muted: #9ca9c9;
+      --accent: #6d7cff;
+      --accent-2: #c953c8;
+      --accent-3: #1de0c3;
+      --chip: #142241;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      --radius: 22px;
     }
 
     * { box-sizing: border-box; }
 
+    html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(110,168,255,0.18), transparent 30%),
-        radial-gradient(circle at top right, rgba(139,92,246,0.14), transparent 25%),
-        var(--bg);
       color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(85, 105, 255, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(201, 83, 200, 0.14), transparent 25%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      min-height: 100vh;
     }
 
     a { color: inherit; text-decoration: none; }
 
     .wrap {
-      width: min(1200px, calc(100% - 32px));
+      width: min(1320px, calc(100% - 24px));
       margin: 0 auto;
-      padding: 28px 0 80px;
+      padding: 22px 0 40px;
     }
 
-    .hero {
-      background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 28px;
-      box-shadow: var(--shadow);
-      margin-bottom: 22px;
-    }
-
-    .hero-top {
+    .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      flex-wrap: wrap;
+      margin-bottom: 18px;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 14px;
+      font-weight: 800;
+      font-size: 26px;
     }
 
-    .logo {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
       display: grid;
       place-items: center;
-      font-size: 22px;
-      font-weight: 700;
-      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 10px 25px rgba(109, 124, 255, 0.28);
     }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(28px, 4vw, 42px);
-      line-height: 1;
-    }
-
-    .sub {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 15px;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .btn,
+    .about-btn,
+    .primary-btn,
+    .secondary-btn,
+    .ghost-btn,
+    .icon-btn,
     button,
     input,
     select,
@@ -102,431 +83,507 @@
       font: inherit;
     }
 
-    .btn,
-    button[type="submit"],
+    .about-btn,
+    .primary-btn,
+    .secondary-btn,
+    .ghost-btn,
+    .icon-btn,
     .search-btn,
+    .favorite-btn,
     .copy-btn,
-    .clear-btn,
-    .toggle-btn,
-    .invite-link {
-      border: 0;
+    .refresh-btn,
+    .clear-btn {
+      border: none;
+      border-radius: 14px;
       cursor: pointer;
-      border-radius: 12px;
-      transition: 0.2s ease;
+      transition: 0.18s ease;
     }
 
-    .btn,
-    button[type="submit"],
-    .search-btn,
-    .toggle-btn,
-    .invite-link {
+    .about-btn,
+    .secondary-btn,
+    .refresh-btn,
+    .clear-btn,
+    .copy-btn,
+    .favorite-btn,
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+    }
+
+    .primary-btn,
+    .search-btn {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: white;
-      padding: 12px 16px;
+      padding: 14px 18px;
       font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      box-shadow: 0 12px 30px rgba(149, 102, 255, 0.24);
     }
 
-    .btn:hover,
-    button[type="submit"]:hover,
+    .about-btn:hover,
+    .primary-btn:hover,
+    .secondary-btn:hover,
+    .ghost-btn:hover,
+    .icon-btn:hover,
     .search-btn:hover,
-    .toggle-btn:hover,
-    .invite-link:hover {
+    .favorite-btn:hover,
+    .copy-btn:hover,
+    .refresh-btn:hover,
+    .clear-btn:hover {
       transform: translateY(-1px);
       filter: brightness(1.05);
     }
 
-    .btn.secondary,
-    .clear-btn,
-    .copy-btn {
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 12px 16px;
-    }
-
-    .search-panel,
-    .post-panel,
-    .stats-panel {
-      background: rgba(18, 25, 51, 0.82);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-
-    .stats-panel {
+    .stats-grid,
+    .main-grid {
       display: grid;
+      gap: 18px;
+    }
+
+    .stats-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
       margin-bottom: 18px;
     }
 
-    .stat {
-      background: rgba(255,255,255,0.035);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 6px;
-    }
-
-    .stat-value {
-      font-size: 28px;
-      font-weight: 800;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1.25fr 0.75fr;
-      gap: 18px;
+    .main-grid {
+      grid-template-columns: 1.62fr 1fr;
       align-items: start;
     }
 
-    .search-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .search-row input,
-    .field input,
-    .field textarea,
-    .field select {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
+    .card,
+    .panel,
+    .stats-card {
+      background: linear-gradient(180deg, rgba(15, 24, 50, 0.96), rgba(10, 19, 41, 0.96));
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 13px 14px;
-      outline: none;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
     }
 
-    .field textarea {
-      min-height: 92px;
-      resize: vertical;
-    }
-
-    .search-row input:focus,
-    .field input:focus,
-    .field textarea:focus,
-    .field select:focus {
-      border-color: rgba(110,168,255,0.7);
-      box-shadow: 0 0 0 3px rgba(110,168,255,0.15);
-    }
-
-    .section-title {
-      margin: 0 0 12px;
-      font-size: 18px;
-    }
-
-    .filters-bar {
+    .stats-card {
+      padding: 22px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
+      gap: 12px;
+      min-height: 118px;
+    }
+
+    .stats-label {
+      color: var(--muted);
+      font-size: 15px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .stats-value {
+      font-size: 50px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stats-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: rgba(109, 124, 255, 0.12);
+      border: 1px solid rgba(109, 124, 255, 0.2);
+      color: #90a3ff;
+      font-size: 23px;
+    }
+
+    .stats-icon.filter { color: #d06bff; background: rgba(201, 83, 200, 0.13); border-color: rgba(201, 83, 200, 0.22); }
+    .stats-icon.tag { color: #b39eff; background: rgba(139, 92, 246, 0.13); border-color: rgba(139, 92, 246, 0.22); }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .search-block {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .search-input,
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      border: 1px solid rgba(118, 142, 208, 0.15);
+      border-radius: 16px;
+      padding: 16px 18px;
+      outline: none;
+    }
+
+    .search-input::placeholder,
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #7f8caf;
+    }
+
+    .search-input:focus,
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: rgba(109, 124, 255, 0.5);
+      box-shadow: 0 0 0 3px rgba(109, 124, 255, 0.12);
+    }
+
+    .action-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sub-label {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 16px;
+      margin: 4px 0 12px;
     }
 
     .tag-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
     .tag-chip {
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      background: var(--chip);
+      border: 1px solid rgba(118, 142, 208, 0.14);
+      color: #dce5ff;
       cursor: pointer;
       user-select: none;
-      font-size: 13px;
       transition: 0.18s ease;
+      font-weight: 700;
     }
 
     .tag-chip:hover {
       transform: translateY(-1px);
-      background: rgba(255,255,255,0.08);
+      border-color: rgba(109, 124, 255, 0.34);
     }
 
     .tag-chip.active {
-      background: linear-gradient(135deg, rgba(110,168,255,0.24), rgba(139,92,246,0.24));
-      border-color: rgba(110,168,255,0.4);
+      background: linear-gradient(135deg, rgba(109, 124, 255, 0.24), rgba(201, 83, 200, 0.2));
+      border-color: rgba(124, 136, 255, 0.38);
     }
 
     .toolbar {
       display: grid;
-      grid-template-columns: 1fr 160px 160px;
-      gap: 10px;
-      margin-bottom: 14px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      color: #dfe7ff;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .field textarea {
+      min-height: 116px;
+      resize: vertical;
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+      line-height: 1.35;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 16px;
     }
 
     .server-list {
       display: grid;
-      gap: 14px;
+      gap: 16px;
     }
 
     .server-card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.025));
-      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(20, 31, 61, 0.7), rgba(13, 24, 50, 0.82));
+      border: 1px solid rgba(118, 142, 208, 0.15);
       border-radius: 18px;
-      padding: 16px;
-      transition: 0.2s ease;
-    }
-
-    .server-card:hover {
-      transform: translateY(-2px);
-      border-color: rgba(110,168,255,0.35);
+      padding: 18px;
     }
 
     .server-top {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
-      align-items: start;
-      margin-bottom: 10px;
-    }
-
-    .server-name {
-      font-size: 22px;
-      font-weight: 800;
-      margin: 0 0 4px;
-    }
-
-    .server-desc {
-      color: var(--muted);
-      margin: 0;
-      line-height: 1.45;
-      font-size: 14px;
-    }
-
-    .server-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 12px 0;
-    }
-
-    .badge {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 7px 10px;
-      font-size: 12px;
-      color: var(--text);
-    }
-
-    .badge.good {
-      border-color: rgba(34,197,94,0.4);
-      color: #d8ffe4;
-      background: rgba(34,197,94,0.12);
-    }
-
-    .server-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .server-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .invite-code {
-      color: var(--muted);
-      font-size: 13px;
-      word-break: break-all;
-    }
-
-    .panel-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      gap: 16px;
       margin-bottom: 12px;
     }
 
-    .field-grid {
-      display: grid;
-      gap: 12px;
+    .server-name {
+      margin: 0 0 10px;
+      font-size: 20px;
+      font-weight: 800;
     }
 
-    .field label {
-      display: block;
-      margin: 0 0 6px;
-      font-size: 13px;
+    .server-desc {
+      margin: 0;
       color: var(--muted);
+      line-height: 1.5;
+      font-size: 15px;
     }
 
-    .helper {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 6px;
-    }
-
-    .status {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      display: none;
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 74px;
+      height: 40px;
+      border-radius: 14px;
+      padding: 0 14px;
+      font-weight: 800;
       font-size: 14px;
+      white-space: nowrap;
     }
 
-    .status.show { display: block; }
-    .status.success {
-      background: rgba(34,197,94,0.12);
-      border: 1px solid rgba(34,197,94,0.35);
-      color: #dcffe8;
+    .status-pill.modded {
+      background: rgba(96, 112, 255, 0.16);
+      border: 1px solid rgba(96, 112, 255, 0.26);
+      color: #aab7ff;
     }
-    .status.error {
-      background: rgba(239,68,68,0.12);
-      border: 1px solid rgba(239,68,68,0.35);
-      color: #ffe0e0;
+
+    .status-pill.vanilla {
+      background: rgba(29, 224, 195, 0.12);
+      border: 1px solid rgba(29, 224, 195, 0.24);
+      color: #6ef4dc;
+    }
+
+    .meta-row,
+    .server-tags,
+    .server-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .meta-row { margin: 14px 0; }
+    .server-tags { margin-bottom: 16px; }
+
+    .meta-pill,
+    .mini-tag {
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(118, 142, 208, 0.12);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: #d9e3ff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .mini-tag {
+      cursor: pointer;
+    }
+
+    .mini-tag.active {
+      background: linear-gradient(135deg, rgba(109, 124, 255, 0.22), rgba(201, 83, 200, 0.16));
+      border-color: rgba(109, 124, 255, 0.34);
+    }
+
+    .favorite-btn.active {
+      background: linear-gradient(135deg, rgba(109, 124, 255, 0.24), rgba(201, 83, 200, 0.22));
+      border-color: rgba(201, 83, 200, 0.36);
+      color: #fff;
+    }
+
+    .invite-code {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      min-height: 44px;
     }
 
     .empty {
-      text-align: center;
+      padding: 28px 18px;
+      border-radius: 18px;
+      border: 1px dashed rgba(118, 142, 208, 0.22);
       color: var(--muted);
-      border: 1px dashed var(--border);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .status-message {
+      margin-top: 14px;
+      padding: 14px 16px;
       border-radius: 16px;
-      padding: 28px 16px;
+      display: none;
+      font-weight: 700;
+    }
+
+    .status-message.show { display: block; }
+    .status-message.success {
+      background: rgba(29, 224, 195, 0.12);
+      border: 1px solid rgba(29, 224, 195, 0.22);
+      color: #9ff6e7;
+    }
+    .status-message.error {
+      background: rgba(255, 87, 133, 0.12);
+      border: 1px solid rgba(255, 87, 133, 0.24);
+      color: #ffc5d6;
     }
 
     .footer-note {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center;
+      margin-top: 20px;
+      background: linear-gradient(180deg, rgba(13, 24, 50, 0.96), rgba(10, 19, 41, 0.96));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      color: #c5d0ef;
+      line-height: 1.6;
+      font-size: 14px;
     }
 
-    @media (max-width: 950px) {
-      .grid,
+    .favorites-toggle {
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 1080px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 780px) {
+      .stats-grid,
       .toolbar,
-      .stats-panel {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 680px) {
-      .wrap {
-        width: min(100%, calc(100% - 20px));
-      }
-
-      .hero,
-      .search-panel,
-      .post-panel,
-      .stats-panel {
-        padding: 14px;
-      }
-
-      .search-row {
+      .search-block {
         grid-template-columns: 1fr;
       }
 
-      .server-top {
-        flex-direction: column;
-      }
-
-      .server-actions {
+      .server-top,
+      .topbar {
         flex-direction: column;
         align-items: stretch;
       }
+
+      .stats-value { font-size: 38px; }
+
+      .brand { font-size: 22px; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <section class="hero">
-      <div class="hero-top">
-        <div class="brand">
-          <div class="logo">W</div>
-          <div>
-            <h1>Windrose Server Finder</h1>
-            <p class="sub">Discover, search, and post multiplayer servers in one clean place.</p>
-          </div>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+        <div>Windrose Server Finder</div>
+      </div>
+      <button class="about-btn" type="button" onclick="document.getElementById('footerNote').scrollIntoView({ behavior: 'smooth' })">ⓘ About</button>
+    </header>
+
+    <section class="stats-grid">
+      <div class="stats-card">
+        <div>
+          <div class="stats-label">Total Servers</div>
+          <div class="stats-value" id="totalServers">0</div>
         </div>
-        <div class="hero-actions">
-          <a href="#servers" class="btn">Browse Servers</a>
-          <a href="#postServer" class="btn secondary">Post a Server</a>
+        <div class="stats-icon">▤</div>
+      </div>
+      <div class="stats-card">
+        <div>
+          <div class="stats-label">Filtered Results</div>
+          <div class="stats-value" id="filteredServers">0</div>
         </div>
+        <div class="stats-icon filter">⏷</div>
+      </div>
+      <div class="stats-card">
+        <div>
+          <div class="stats-label">Selected Tags</div>
+          <div class="stats-value" id="selectedTagsCount">0</div>
+        </div>
+        <div class="stats-icon tag">🏷</div>
       </div>
     </section>
 
-    <section class="stats-panel">
-      <div class="stat">
-        <div class="stat-label">Total Servers</div>
-        <div class="stat-value" id="totalServers">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Filtered Results</div>
-        <div class="stat-value" id="filteredServers">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Selected Tags</div>
-        <div class="stat-value" id="selectedTagsCount">0</div>
-      </div>
-    </section>
-
-    <div class="grid">
-      <section class="search-panel" id="servers">
+    <main class="main-grid">
+      <section class="panel">
         <div class="panel-head">
           <h2 class="section-title">Find a Server</h2>
-          <button class="toggle-btn" id="refreshBtn" type="button">Refresh</button>
+          <button class="refresh-btn" id="refreshBtn" type="button">Refresh</button>
         </div>
 
-        <div class="search-row">
-          <input id="searchInput" type="text" placeholder="Search by name, description, tag, or invite code" />
-          <button id="searchBtn" class="search-btn" type="button">Search</button>
+        <div class="search-block">
+          <input class="search-input" id="searchInput" type="text" placeholder="Search by name, description, tag, or invite code" />
+          <div class="action-column">
+            <button class="search-btn" id="searchBtn" type="button">Search</button>
+            <button class="clear-btn" id="clearFiltersBtn" type="button">Clear Filters</button>
+          </div>
         </div>
 
-        <div class="filters-bar">
-          <strong>Quick Tags</strong>
-          <button id="clearFiltersBtn" class="clear-btn" type="button">Clear Filters</button>
-        </div>
-
+        <div class="sub-label">Quick Tags</div>
         <div id="tagFilters" class="tag-list"></div>
 
         <div class="toolbar">
-          <select id="sortSelect">
-            <option value="newest">Sort: Newest</option>
-            <option value="name_asc">Sort: Name A-Z</option>
-            <option value="name_desc">Sort: Name Z-A</option>
-          </select>
+          <div class="field">
+            <label for="sortSelect">Sort:</label>
+            <select id="sortSelect">
+              <option value="newest">Newest</option>
+              <option value="name_asc">Name A-Z</option>
+              <option value="name_desc">Name Z-A</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="moddedFilter">Server Type:</label>
+            <select id="moddedFilter">
+              <option value="all">All Servers</option>
+              <option value="modded">Modded</option>
+              <option value="vanilla">Vanilla</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="playersFilter">Max Players:</label>
+            <select id="playersFilter">
+              <option value="all">Any Player Count</option>
+              <option value="small">1-25</option>
+              <option value="medium">26-64</option>
+              <option value="large">65+</option>
+            </select>
+          </div>
+        </div>
 
-          <select id="moddedFilter">
-            <option value="all">All Servers</option>
-            <option value="modded">Modded Only</option>
-            <option value="vanilla">Vanilla Only</option>
-          </select>
-
-          <select id="playersFilter">
-            <option value="all">Any Player Count</option>
-            <option value="small">1-25 Max</option>
-            <option value="medium">26-64 Max</option>
-            <option value="large">65+ Max</option>
-          </select>
+        <div class="favorites-toggle">
+          <button class="ghost-btn" id="favoritesOnlyBtn" type="button">Show Favorites Only: Off</button>
         </div>
 
         <div id="serverList" class="server-list"></div>
       </section>
 
-      <section class="post-panel" id="postServer">
+      <section class="panel">
         <div class="panel-head">
           <h2 class="section-title">Post Your Server</h2>
         </div>
@@ -535,22 +592,22 @@
           <div class="field-grid">
             <div class="field">
               <label for="name">Server Name</label>
-              <input id="name" name="name" type="text" required />
+              <input id="name" name="name" type="text" placeholder="Enter server name" required />
             </div>
 
             <div class="field">
               <label for="description">Description</label>
-              <textarea id="description" name="description" placeholder="What makes your server stand out?"></textarea>
+              <textarea id="description" name="description" placeholder="Enter description (optional)"></textarea>
             </div>
 
             <div class="field">
               <label for="invite_code">Invite Code</label>
-              <input id="invite_code" name="invite_code" type="text" required />
+              <input id="invite_code" name="invite_code" type="text" placeholder="Enter invite code" required />
             </div>
 
             <div class="field">
               <label for="max_players">Max Player Count</label>
-              <input id="max_players" name="max_players" type="number" min="1" placeholder="Example: 64" />
+              <input id="max_players" name="max_players" type="number" min="1" placeholder="Enter max player count (optional)" />
             </div>
 
             <div class="field">
@@ -562,46 +619,48 @@
             </div>
 
             <div class="field">
-              <label for="tags">Tags</label>
-              <input id="tags" name="tags" type="text" placeholder="pvp, casual, survival" />
-              <div class="helper">Separate tags with commas.</div>
+              <label for="tags">Tags (comma separated)</label>
+              <input id="tags" name="tags" type="text" placeholder="e.g. new player friendly, roleplay, chill" />
+              <div class="helper">Try tags like new player friendly, roleplay, modded, chill, hardcore. The pvp tag is blocked.</div>
             </div>
 
-            <button type="submit">Post Server</button>
+            <button class="primary-btn" type="submit">Post Server</button>
           </div>
         </form>
 
-        <div id="formStatus" class="status"></div>
+        <div class="status-message" id="formStatus"></div>
       </section>
-    </div>
+    </main>
 
-    <div class="footer-note">
-  <strong>Unofficial Community Project:</strong> This website is not affiliated with or endorsed by Windrose. The creator is not part of the official Windrose team. This project is made for the community and is not monetized or used to generate any income.<br>
-  All trademarks and game content belong to their respective owners.
-</div>
+    <footer class="footer-note" id="footerNote">
+      <strong>Unofficial Community Project:</strong> This website is not affiliated with or endorsed by Windrose. The creator is not part of the official Windrose team. This project is made for the community and is not monetized or used to generate any income.<br>
+      All trademarks and game content belong to their respective owners.
+    </footer>
   </div>
 
   <script>
-    // =========================
-    // SUPABASE SETUP
-    // =========================
-    const SUPABASE_URL = "https://yfzifzllysjuglaywsdn.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
     const TABLE_NAME = "servers";
 
     const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // =========================
-    // STATE
-    // =========================
     let allServers = [];
     let filteredServers = [];
     let activeTags = new Set();
     let currentSearch = "";
+    let favoritesOnly = false;
 
-    // =========================
-    // ELEMENTS
-    // =========================
+    const PRESET_TAGS = [
+      { label: "New Player Friendly", icon: "🌿", value: "new player friendly" },
+      { label: "Roleplay", icon: "🎭", value: "roleplay" },
+      { label: "Modded", icon: "🔧", value: "modded" },
+      { label: "Chill / Casual", icon: "🙂", value: "chill / casual" },
+      { label: "Hardcore", icon: "🔥", value: "hardcore" }
+    ];
+
+    const BANNED_TAGS = ["pvp"];
+
     const serverListEl = document.getElementById("serverList");
     const tagFiltersEl = document.getElementById("tagFilters");
     const searchInputEl = document.getElementById("searchInput");
@@ -611,26 +670,51 @@
     const moddedFilterEl = document.getElementById("moddedFilter");
     const playersFilterEl = document.getElementById("playersFilter");
     const refreshBtnEl = document.getElementById("refreshBtn");
+    const favoritesOnlyBtnEl = document.getElementById("favoritesOnlyBtn");
 
     const totalServersEl = document.getElementById("totalServers");
     const filteredServersEl = document.getElementById("filteredServers");
     const selectedTagsCountEl = document.getElementById("selectedTagsCount");
-
     const serverFormEl = document.getElementById("serverForm");
     const formStatusEl = document.getElementById("formStatus");
 
-    // =========================
-    // HELPERS
-    // =========================
+    function getFavorites() {
+      try {
+        return JSON.parse(localStorage.getItem("windroseFavorites") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveFavorites(ids) {
+      localStorage.setItem("windroseFavorites", JSON.stringify(ids));
+    }
+
+    function isFavorite(id) {
+      return getFavorites().includes(id);
+    }
+
+    function toggleFavorite(id) {
+      const favorites = getFavorites();
+      const exists = favorites.includes(id);
+      const next = exists ? favorites.filter(item => item !== id) : [...favorites, id];
+      saveFavorites(next);
+      applyFilters();
+    }
+
     function normalizeTags(tags) {
       if (!tags) return [];
+
       if (Array.isArray(tags)) {
-        return tags.map(t => String(t).trim().toLowerCase()).filter(Boolean);
+        return tags
+          .map(t => String(t).trim().toLowerCase())
+          .filter(t => t && !BANNED_TAGS.includes(t));
       }
+
       return String(tags)
         .split(",")
         .map(t => t.trim().toLowerCase())
-        .filter(Boolean);
+        .filter(t => t && !BANNED_TAGS.includes(t));
     }
 
     function escapeHtml(text) {
@@ -651,21 +735,26 @@
 
     function showStatus(message, type = "success") {
       formStatusEl.textContent = message;
-      formStatusEl.className = `status show ${type}`;
+      formStatusEl.className = `status-message show ${type}`;
     }
 
     function updateStats() {
       totalServersEl.textContent = allServers.length;
       filteredServersEl.textContent = filteredServers.length;
       selectedTagsCountEl.textContent = activeTags.size;
+      favoritesOnlyBtnEl.textContent = `Show Favorites Only: ${favoritesOnly ? "On" : "Off"}`;
     }
 
     function getAllTags(servers) {
-      const tagSet = new Set();
+      const tagSet = new Set(PRESET_TAGS.map(tag => tag.value));
       servers.forEach(server => {
         normalizeTags(server.tags).forEach(tag => tagSet.add(tag));
       });
-      return [...tagSet].sort((a, b) => a.localeCompare(b));
+      return [...tagSet].filter(tag => !BANNED_TAGS.includes(tag)).sort((a, b) => a.localeCompare(b));
+    }
+
+    function getTagMeta(tag) {
+      return PRESET_TAGS.find(item => item.value === tag) || null;
     }
 
     function serverMatchesPlayersFilter(server, filterValue) {
@@ -682,16 +771,11 @@
       const moddedFilter = moddedFilterEl.value;
       const playersFilter = playersFilterEl.value;
       const sortValue = sortSelectEl.value;
+      const favoriteIds = getFavorites();
 
       filteredServers = allServers.filter(server => {
         const tags = normalizeTags(server.tags);
-        const searchableText = [
-          server.name,
-          server.description,
-          server.invite_code,
-          tags.join(" ")
-        ].join(" ").toLowerCase();
-
+        const searchableText = [server.name, server.description, server.invite_code, tags.join(" ")].join(" ").toLowerCase();
         const matchesSearch = !search || searchableText.includes(search);
         const matchesTags = activeTags.size === 0 || [...activeTags].every(tag => tags.includes(tag));
 
@@ -700,8 +784,9 @@
         if (moddedFilter === "vanilla") matchesModded = !server.modded;
 
         const matchesPlayers = serverMatchesPlayersFilter(server, playersFilter);
+        const matchesFavorites = !favoritesOnly || favoriteIds.includes(server.id);
 
-        return matchesSearch && matchesTags && matchesModded && matchesPlayers;
+        return matchesSearch && matchesTags && matchesModded && matchesPlayers && matchesFavorites;
       });
 
       filteredServers.sort((a, b) => {
@@ -716,26 +801,27 @@
 
     function renderTagFilters() {
       const tags = getAllTags(allServers);
-
-      if (tags.length === 0) {
+      if (!tags.length) {
         tagFiltersEl.innerHTML = '<div class="helper">No tags found yet.</div>';
         return;
       }
 
-      tagFiltersEl.innerHTML = tags.map(tag => `
-        <button class="tag-chip ${activeTags.has(tag) ? "active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
-          ${escapeHtml(titleCase(tag))}
-        </button>
-      `).join("");
+      tagFiltersEl.innerHTML = tags.map(tag => {
+        const meta = getTagMeta(tag);
+        const label = meta ? meta.label : titleCase(tag);
+        const icon = meta ? meta.icon + ' ' : '';
+        return `
+          <button class="tag-chip ${activeTags.has(tag) ? 'active' : ''}" type="button" data-tag="${escapeHtml(tag)}">
+            <span>${icon}</span><span>${escapeHtml(label)}</span>
+          </button>
+        `;
+      }).join("");
 
-      tagFiltersEl.querySelectorAll(".tag-chip").forEach(btn => {
+      tagFiltersEl.querySelectorAll("[data-tag]").forEach(btn => {
         btn.addEventListener("click", () => {
           const tag = btn.dataset.tag;
-          if (activeTags.has(tag)) {
-            activeTags.delete(tag);
-          } else {
-            activeTags.add(tag);
-          }
+          if (activeTags.has(tag)) activeTags.delete(tag);
+          else activeTags.add(tag);
           renderTagFilters();
           applyFilters();
         });
@@ -746,8 +832,8 @@
       if (!filteredServers.length) {
         serverListEl.innerHTML = `
           <div class="empty">
-            <strong>No servers found.</strong>
-            <div style="margin-top:8px;">Try clearing filters or changing your search.</div>
+            <strong>No servers found.</strong><br>
+            Try clearing filters, turning favorites off, or changing your search.
           </div>
         `;
         return;
@@ -755,35 +841,39 @@
 
       serverListEl.innerHTML = filteredServers.map(server => {
         const tags = normalizeTags(server.tags);
-        const inviteCode = escapeHtml(server.invite_code || "");
-        const serverName = escapeHtml(server.name || "Untitled Server");
-        const desc = escapeHtml(server.description || "No description provided.");
-        const maxPlayers = server.max_players ? `${escapeHtml(server.max_players)} Max Players` : "No Player Limit Set";
-        const moddedLabel = server.modded ? "Modded" : "Vanilla";
-        const createdAt = server.created_at ? new Date(server.created_at).toLocaleDateString() : "Unknown";
+        const favorite = isFavorite(server.id);
+        const statusClass = server.modded ? 'modded' : 'vanilla';
+        const statusLabel = server.modded ? 'Modded' : 'Vanilla';
+        const createdAt = server.created_at ? new Date(server.created_at).toLocaleDateString() : 'Unknown';
+        const maxPlayers = server.max_players ? `${server.max_players} Max Players` : 'No Player Limit Set';
 
         return `
           <article class="server-card">
             <div class="server-top">
               <div>
-                <h3 class="server-name">${serverName}</h3>
-                <p class="server-desc">${desc}</p>
+                <h3 class="server-name">${escapeHtml(server.name || 'Untitled Server')}</h3>
+                <p class="server-desc">${escapeHtml(server.description || 'No description provided.')}</p>
               </div>
-              <div class="badge good">${escapeHtml(moddedLabel)}</div>
+              <div class="status-pill ${statusClass}">${statusLabel}</div>
             </div>
 
-            <div class="server-badges">
-              <div class="badge">${escapeHtml(maxPlayers)}</div>
-              <div class="badge">Posted ${escapeHtml(createdAt)}</div>
+            <div class="meta-row">
+              <div class="meta-pill">${escapeHtml(maxPlayers)}</div>
+              <div class="meta-pill">Posted ${escapeHtml(createdAt)}</div>
             </div>
 
             <div class="server-tags">
-              ${tags.length ? tags.map(tag => `<button class="tag-chip ${activeTags.has(tag) ? "active" : ""}" type="button" data-server-tag="${escapeHtml(tag)}">${escapeHtml(titleCase(tag))}</button>`).join("") : '<span class="badge">No Tags</span>'}
+              ${tags.length ? tags.map(tag => `
+                <button class="mini-tag ${activeTags.has(tag) ? 'active' : ''}" type="button" data-server-tag="${escapeHtml(tag)}">
+                  ${escapeHtml(getTagMeta(tag)?.label || titleCase(tag))}
+                </button>
+              `).join("") : '<div class="meta-pill">No Tags</div>'}
             </div>
 
             <div class="server-actions">
-              <button class="copy-btn" type="button" data-copy="${inviteCode}">Copy Invite Code</button>
-              <div class="invite-code">Invite Code: <strong>${inviteCode}</strong></div>
+              <button class="copy-btn" type="button" data-copy="${escapeHtml(server.invite_code || '')}">⧉ Copy Invite Code</button>
+              <button class="favorite-btn ${favorite ? 'active' : ''}" type="button" data-favorite="${escapeHtml(server.id || '')}">${favorite ? '★ Favorited' : '☆ Favorite'}</button>
+              <div class="invite-code">Invite Code: <strong>${escapeHtml(server.invite_code || '')}</strong></div>
             </div>
           </article>
         `;
@@ -791,14 +881,13 @@
 
       serverListEl.querySelectorAll("[data-copy]").forEach(btn => {
         btn.addEventListener("click", async () => {
-          const code = btn.dataset.copy;
           try {
-            await navigator.clipboard.writeText(code);
+            await navigator.clipboard.writeText(btn.dataset.copy || "");
             const original = btn.textContent;
-            btn.textContent = "Copied";
+            btn.textContent = 'Copied';
             setTimeout(() => btn.textContent = original, 1200);
           } catch {
-            alert("Could not copy invite code.");
+            alert('Could not copy invite code.');
           }
         });
       });
@@ -806,27 +895,27 @@
       serverListEl.querySelectorAll("[data-server-tag]").forEach(btn => {
         btn.addEventListener("click", () => {
           const tag = btn.dataset.serverTag;
-          if (activeTags.has(tag)) {
-            activeTags.delete(tag);
-          } else {
-            activeTags.add(tag);
-          }
+          if (activeTags.has(tag)) activeTags.delete(tag);
+          else activeTags.add(tag);
           renderTagFilters();
           applyFilters();
         });
       });
+
+      serverListEl.querySelectorAll("[data-favorite]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          toggleFavorite(btn.dataset.favorite);
+        });
+      });
     }
 
-    // =========================
-    // SUPABASE ACTIONS
-    // =========================
     async function loadServers() {
       serverListEl.innerHTML = '<div class="empty">Loading servers...</div>';
 
       const { data, error } = await client
         .from(TABLE_NAME)
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select('*')
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error(error);
@@ -841,73 +930,71 @@
 
     async function createServer(event) {
       event.preventDefault();
-      showStatus("Posting server...", "success");
+      showStatus('Posting server...', 'success');
 
       const formData = new FormData(serverFormEl);
       const payload = {
-        name: String(formData.get("name") || "").trim(),
-        description: String(formData.get("description") || "").trim(),
-        invite_code: String(formData.get("invite_code") || "").trim(),
-        max_players: formData.get("max_players") ? Number(formData.get("max_players")) : null,
-        modded: String(formData.get("modded")) === "true",
-        tags: normalizeTags(formData.get("tags"))
+        name: String(formData.get('name') || '').trim(),
+        description: String(formData.get('description') || '').trim(),
+        invite_code: String(formData.get('invite_code') || '').trim(),
+        max_players: formData.get('max_players') ? Number(formData.get('max_players')) : null,
+        modded: String(formData.get('modded')) === 'true',
+        tags: normalizeTags(formData.get('tags'))
       };
 
       if (!payload.name || !payload.invite_code) {
-        showStatus("Server name and invite code are required.", "error");
+        showStatus('Server name and invite code are required.', 'error');
         return;
       }
 
-      const { error } = await client
-        .from(TABLE_NAME)
-        .insert([payload]);
+      const { error } = await client.from(TABLE_NAME).insert([payload]);
 
       if (error) {
         console.error(error);
-        showStatus("Could not post server. Check your table columns and RLS rules.", "error");
+        showStatus('Could not post server. Check your table columns and RLS rules.', 'error');
         return;
       }
 
       serverFormEl.reset();
-      showStatus("Server posted successfully.", "success");
+      showStatus('Server posted successfully.', 'success');
       await loadServers();
     }
 
-    // =========================
-    // EVENTS
-    // =========================
-    searchBtnEl.addEventListener("click", () => {
+    searchBtnEl.addEventListener('click', () => {
       currentSearch = searchInputEl.value;
       applyFilters();
     });
 
-    searchInputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+    searchInputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
         currentSearch = searchInputEl.value;
         applyFilters();
       }
     });
 
-    clearFiltersBtnEl.addEventListener("click", () => {
+    clearFiltersBtnEl.addEventListener('click', () => {
       activeTags.clear();
-      currentSearch = "";
-      searchInputEl.value = "";
-      sortSelectEl.value = "newest";
-      moddedFilterEl.value = "all";
-      playersFilterEl.value = "all";
+      currentSearch = '';
+      favoritesOnly = false;
+      searchInputEl.value = '';
+      sortSelectEl.value = 'newest';
+      moddedFilterEl.value = 'all';
+      playersFilterEl.value = 'all';
       renderTagFilters();
       applyFilters();
     });
 
-    sortSelectEl.addEventListener("change", applyFilters);
-    moddedFilterEl.addEventListener("change", applyFilters);
-    playersFilterEl.addEventListener("change", applyFilters);
-    refreshBtnEl.addEventListener("click", loadServers);
-    serverFormEl.addEventListener("submit", createServer);
+    favoritesOnlyBtnEl.addEventListener('click', () => {
+      favoritesOnly = !favoritesOnly;
+      applyFilters();
+    });
 
-    // =========================
-    // START
-    // =========================
+    sortSelectEl.addEventListener('change', applyFilters);
+    moddedFilterEl.addEventListener('change', applyFilters);
+    playersFilterEl.addEventListener('change', applyFilters);
+    refreshBtnEl.addEventListener('click', loadServers);
+    serverFormEl.addEventListener('submit', createServer);
+
     loadServers();
   </script>
 </body>
