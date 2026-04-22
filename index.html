@@ -1,157 +1,370 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Windrose Server Finder</title>
-
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background: #000;
-      color: #fff;
+      margin: 0;
+      min-height: 100vh;
       font-family: Arial, sans-serif;
-      padding: 30px;
+      background: linear-gradient(180deg, #0b0b10 0%, #11111a 100%);
+      color: #ffffff;
     }
 
-    h1 { font-size: 42px; margin-bottom: 20px; }
-    h2 { margin-top: 30px; }
+    .wrapper {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 20px 60px;
+    }
 
-    input, button {
-      display: block;
+    .hero {
+      margin-bottom: 30px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 12px;
+      margin-bottom: 16px;
+      border-radius: 999px;
+      background: rgba(124, 92, 255, 0.14);
+      border: 1px solid rgba(124, 92, 255, 0.35);
+      color: #d6cbff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #b8b8c9;
+      font-size: 18px;
+      line-height: 1.5;
+      max-width: 700px;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(6px);
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: 28px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+      max-width: 540px;
+    }
+
+    input {
       width: 100%;
-      max-width: 420px;
-      padding: 12px;
-      margin-bottom: 10px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #2f2f3d;
+      background: #171721;
+      color: #fff;
       font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .error { color: red; }
-    .success { color: lime; }
+    input:focus {
+      border-color: #7c5cff;
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.18);
+    }
 
-    .server {
-      background: #111;
-      border: 1px solid #333;
-      padding: 10px;
-      margin-top: 10px;
+    input::placeholder {
+      color: #9f9fb2;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 16px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #7c5cff, #5b8cff);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      opacity: 0.96;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    #message {
+      min-height: 22px;
+      margin-top: 14px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .error {
+      color: #ff7f7f;
+    }
+
+    .success {
+      color: #7df0a8;
+    }
+
+    .server-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .server-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      background: #15151f;
+      border: 1px solid #2d2d3a;
+      border-radius: 16px;
+      padding: 18px;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+
+    .server-card:hover {
+      border-color: #47475b;
+      transform: translateY(-2px);
+    }
+
+    .server-main {
+      min-width: 0;
+    }
+
+    .server-name {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .server-code {
+      font-size: 16px;
+      color: #c9c9da;
+      word-break: break-word;
+    }
+
+    .copy-btn {
+      width: auto;
+      min-width: 110px;
+      padding: 12px 16px;
+      background: #222233;
+      border: 1px solid #35354a;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .copy-btn:hover {
+      background: #2a2a3f;
+    }
+
+    .empty-state {
+      color: #aaaabc;
+      padding: 10px 0 4px;
+    }
+
+    @media (max-width: 700px) {
+      h1 {
+        font-size: 42px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+      }
+
+      .server-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .copy-btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
-
 <body>
+  <div class="wrapper">
+    <div class="hero">
+      <div class="badge">Unofficial Community Directory</div>
+      <h1>Windrose Server Finder</h1>
+      <p class="subtitle">
+        Post your server invite code and help players find active Windrose communities faster.
+      </p>
+    </div>
 
-<h1>Windrose Server Finder</h1>
+    <div class="panel">
+      <h2>Post Server</h2>
 
-<h2>Post Server</h2>
+      <div class="form-grid">
+        <input id="name" placeholder="Server Name" />
+        <input id="code" placeholder="Invite Code" />
+        <button id="postBtn">Post Server</button>
+      </div>
 
-<input id="name" placeholder="Server Name" />
-<input id="code" placeholder="Invite Code" />
-<button id="postBtn">Post</button>
+      <div id="message"></div>
+    </div>
 
-<div id="message"></div>
+    <div class="panel">
+      <h2>Servers</h2>
+      <div id="list" class="server-list">Loading...</div>
+    </div>
+  </div>
 
-<h2>Servers</h2>
-<div id="list">Loading...</div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://yfizfzllysjuglaywsdn.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    const messageBox = document.getElementById("message");
+    const list = document.getElementById("list");
+    const nameInput = document.getElementById("name");
+    const codeInput = document.getElementById("code");
+    const postBtn = document.getElementById("postBtn");
 
-<script>
-  // 🔑 PASTE YOUR NEW KEY HERE
-  const SUPABASE_URL = "https://yfzifzllysjuglaywsdn.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
-
-  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  const nameInput = document.getElementById("name");
-  const codeInput = document.getElementById("code");
-  const postBtn = document.getElementById("postBtn");
-  const list = document.getElementById("list");
-  const messageBox = document.getElementById("message");
-
-  function showMessage(msg, type = "error") {
-    messageBox.className = type;
-    messageBox.textContent = msg;
-  }
-
-  function clearMessage() {
-    messageBox.textContent = "";
-    messageBox.className = "";
-  }
-
-  async function loadServers() {
-    clearMessage();
-
-    const { data, error } = await client
-      .from("servers")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      showMessage("Load error: " + error.message);
-      return;
+    function showMessage(text, type = "error") {
+      messageBox.className = type;
+      messageBox.textContent = text;
     }
 
-    list.innerHTML = "";
-
-    if (!data.length) {
-      list.innerHTML = "<p>No servers yet</p>";
-      return;
+    function clearMessage() {
+      messageBox.className = "";
+      messageBox.textContent = "";
     }
 
-    data.forEach(s => {
-      list.innerHTML += `
-        <div class="server">
-          <strong>${s.server_name}</strong><br>
-          Code: ${s.invite_code}
-        </div>
-      `;
-    });
-  }
-
-  async function addServer() {
-    const name = nameInput.value.trim();
-    const code = codeInput.value.trim();
-
-    if (!name || !code) {
-      showMessage("Fill in both fields");
-      return;
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    clearMessage();
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 🚫 Prevent duplicate invite codes
-    const { data: existing } = await client
-      .from("servers")
-      .select("*")
-      .eq("invite_code", code);
+    async function loadServers() {
+      clearMessage();
 
-    if (existing && existing.length > 0) {
-      showMessage("That invite code already exists");
-      return;
+      const { data, error } = await client
+        .from("servers")
+        .select("*")
+        .eq("status", "live")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        showMessage("Load error: " + error.message);
+        list.innerHTML = "";
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        list.innerHTML = '<div class="empty-state">No servers posted yet.</div>';
+        return;
+      }
+
+      list.innerHTML = "";
+
+      data.forEach((server) => {
+        const safeName = escapeHtml(server.server_name || "Unnamed Server");
+        const safeCode = escapeHtml(server.invite_code || "");
+
+        const div = document.createElement("div");
+        div.className = "server-card";
+        div.innerHTML = `
+          <div class="server-main">
+            <div class="server-name">${safeName}</div>
+            <div class="server-code">Code: ${safeCode}</div>
+          </div>
+          <button class="copy-btn" data-code="${safeCode}">Copy Code</button>
+        `;
+
+        list.appendChild(div);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const code = button.getAttribute("data-code");
+
+          try {
+            await navigator.clipboard.writeText(code);
+            const original = button.textContent;
+            button.textContent = "Copied";
+            setTimeout(() => {
+              button.textContent = original;
+            }, 1200);
+          } catch (err) {
+            showMessage("Could not copy code.");
+          }
+        });
+      });
     }
 
-    const { error } = await client
-      .from("servers")
-      .insert([
-        { server_name: name, invite_code: code, status: "live" }
-      ]);
+    async function addServer() {
+      const serverName = nameInput.value.trim();
+      const inviteCode = codeInput.value.trim();
 
-    if (error) {
-      showMessage("Post error: " + error.message);
-      return;
+      if (!serverName || !inviteCode) {
+        showMessage("Fill in both fields.");
+        return;
+      }
+
+      clearMessage();
+
+      const { error } = await client
+        .from("servers")
+        .insert([
+          {
+            server_name: serverName,
+            invite_code: inviteCode,
+            status: "live"
+          }
+        ]);
+
+      if (error) {
+        showMessage("Post error: " + error.message);
+        return;
+      }
+
+      showMessage("Server posted.", "success");
+      nameInput.value = "";
+      codeInput.value = "";
+
+      await loadServers();
     }
 
-    showMessage("Server posted!", "success");
-
-    nameInput.value = "";
-    codeInput.value = "";
+    postBtn.addEventListener("click", addServer);
 
     loadServers();
-  }
-
-  postBtn.onclick = addServer;
-
-  loadServers();
-</script>
-
+  </script>
 </body>
 </html>
