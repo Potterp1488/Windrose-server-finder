@@ -1,40 +1,153 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Windrose Server Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
 
-<script>
-const supabase = supabase.createClient(
-  "https://yfizfzllysjuglaywsdn.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0"
-)
+    h1, h2 {
+      margin-top: 0;
+    }
 
-async function addServer() {
-  const name = document.getElementById("name").value.trim()
-  const code = document.getElementById("code").value.trim()
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      box-sizing: border-box;
+    }
 
-  if (!name || !code) {
-    alert("Fill everything")
-    return
-  }
+    button {
+      cursor: pointer;
+    }
 
-  const { error } = await supabase
-    .from('servers')
-    .insert([{ server_name: name, invite_code: code }])
+    .server {
+      border: 1px solid #333;
+      padding: 10px;
+      margin-top: 10px;
+      max-width: 500px;
+      background: #111;
+    }
 
-  if (error) {
-    alert("Error: " + error.message)
-  } else {
-    loadServers()
-  }
-}
+    .error {
+      color: #ff6b6b;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Windrose Server Finder</h1>
 
-async function loadServers() {
-  const { data } = await supabase
-    .from('servers')
-    .select('*')
+  <h2>Post Server</h2>
+  <input id="name" placeholder="Server Name" />
+  <input id="code" placeholder="Invite Code" />
+  <button id="postBtn">Post</button>
 
-  const list = document.getElementById("list")
-  list.innerHTML = ""
+  <div id="error" class="error"></div>
 
-  data.forEach(s => {
+  <h2>Servers</h2>
+  <div id="list"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const errorBox = document.getElementById("error");
+
+    function showError(message) {
+      errorBox.textContent = message || "";
+    }
+
+    let client;
+
+    try {
+      client = window.supabase.createClient(
+        "https://yfizfzllysjuglaywsdn.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0"
+      );
+    } catch (err) {
+      showError("Supabase startup error: " + err.message);
+    }
+
+    async function loadServers() {
+      if (!client) return;
+
+      showError("");
+
+      const { data, error } = await client
+        .from("servers")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        showError("Load error: " + error.message);
+        return;
+      }
+
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        list.innerHTML = "<p>No servers posted yet.</p>";
+        return;
+      }
+
+      data.forEach((s) => {
+        list.innerHTML += `
+          <div class="server">
+            <b>${s.server_name || "Unnamed Server"}</b><br>
+            Code: ${s.invite_code || ""}
+          </div>
+        `;
+      });
+    }
+
+    async function addServer() {
+      if (!client) return;
+
+      const name = document.getElementById("name").value.trim();
+      const code = document.getElementById("code").value.trim();
+
+      if (!name || !code) {
+        showError("Fill in both fields.");
+        return;
+      }
+
+      showError("");
+
+      const { error } = await client
+        .from("servers")
+        .insert([
+          {
+            server_name: name,
+            invite_code: code
+          }
+        ]);
+
+      if (error) {
+        showError("Post error: " + error.message);
+        return;
+      }
+
+      document.getElementById("name").value = "";
+      document.getElementById("code").value = "";
+
+      loadServers();
+    }
+
+    document.getElementById("postBtn").addEventListener("click", addServer);
+
+    loadServers();
+  </script>
+</body>
+</html>  data.forEach(s => {
     list.innerHTML += `
       <div class="server">
         <b>${s.server_name}</b><br>
