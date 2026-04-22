@@ -1,27 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Windrose Server Finder</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Windrose Server Finder</title>
   <style>
     body {
       background: #000;
       color: #fff;
       font-family: Arial, sans-serif;
-      padding: 20px;
       margin: 0;
+      padding: 30px;
     }
 
-    h1, h2 {
-      margin-top: 0;
+    h1 {
+      font-size: 48px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      margin-top: 30px;
+      margin-bottom: 15px;
     }
 
     input, button {
-      padding: 10px;
-      margin: 5px 0;
       display: block;
       width: 100%;
-      max-width: 320px;
+      max-width: 420px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 18px;
       box-sizing: border-box;
     }
 
@@ -29,18 +37,34 @@
       cursor: pointer;
     }
 
-    .server {
-      border: 1px solid #333;
-      padding: 10px;
-      margin-top: 10px;
-      max-width: 500px;
-      background: #111;
-    }
-
     .error {
       color: #ff6b6b;
-      margin-top: 10px;
-      white-space: pre-wrap;
+      margin: 12px 0;
+      font-size: 18px;
+    }
+
+    .success {
+      color: #7dff7d;
+      margin: 12px 0;
+      font-size: 18px;
+    }
+
+    .server {
+      border: 1px solid #333;
+      background: #111;
+      padding: 15px;
+      margin-top: 12px;
+      max-width: 600px;
+    }
+
+    .server-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .server-code {
+      color: #ccc;
     }
   </style>
 </head>
@@ -48,114 +72,108 @@
   <h1>Windrose Server Finder</h1>
 
   <h2>Post Server</h2>
+
   <input id="name" placeholder="Server Name" />
   <input id="code" placeholder="Invite Code" />
   <button id="postBtn">Post</button>
 
-  <div id="error" class="error"></div>
+  <div id="message"></div>
 
   <h2>Servers</h2>
-  <div id="list"></div>
+  <div id="list">Loading...</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const errorBox = document.getElementById("error");
+    const SUPABASE_URL = "https://yfizfzllysjuglaywsdn.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
 
-    function showError(message) {
-      errorBox.textContent = message || "";
+    const messageBox = document.getElementById("message");
+    const list = document.getElementById("list");
+    const nameInput = document.getElementById("name");
+    const codeInput = document.getElementById("code");
+    const postBtn = document.getElementById("postBtn");
+
+    function showMessage(text, type = "error") {
+      messageBox.className = type;
+      messageBox.textContent = text;
     }
 
-    let client;
-
-    try {
-      client = window.supabase.createClient(
-        "https://yfizfzllysjuglaywsdn.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0"
-      );
-    } catch (err) {
-      showError("Supabase startup error: " + err.message);
+    function clearMessage() {
+      messageBox.className = "";
+      messageBox.textContent = "";
     }
+
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function loadServers() {
-      if (!client) return;
-
-      showError("");
+      clearMessage();
 
       const { data, error } = await client
         .from("servers")
         .select("*")
+        .eq("status", "live")
         .order("created_at", { ascending: false });
 
       if (error) {
-        showError("Load error: " + error.message);
+        showMessage("Load error: " + error.message);
+        list.innerHTML = "";
         return;
       }
-
-      const list = document.getElementById("list");
-      list.innerHTML = "";
 
       if (!data || data.length === 0) {
         list.innerHTML = "<p>No servers posted yet.</p>";
         return;
       }
 
-      data.forEach((s) => {
-        list.innerHTML += `
-          <div class="server">
-            <b>${s.server_name || "Unnamed Server"}</b><br>
-            Code: ${s.invite_code || ""}
-          </div>
+      list.innerHTML = "";
+
+      data.forEach((server) => {
+        const div = document.createElement("div");
+        div.className = "server";
+        div.innerHTML = `
+          <div class="server-name">${server.server_name}</div>
+          <div class="server-code">Code: ${server.invite_code}</div>
         `;
+        list.appendChild(div);
       });
     }
 
     async function addServer() {
-      if (!client) return;
+      const serverName = nameInput.value.trim();
+      const inviteCode = codeInput.value.trim();
 
-      const name = document.getElementById("name").value.trim();
-      const code = document.getElementById("code").value.trim();
-
-      if (!name || !code) {
-        showError("Fill in both fields.");
+      if (!serverName || !inviteCode) {
+        showMessage("Fill in both fields.");
         return;
       }
 
-      showError("");
+      clearMessage();
 
       const { error } = await client
         .from("servers")
         .insert([
           {
-            server_name: name,
-            invite_code: code
+            server_name: serverName,
+            invite_code: inviteCode,
+            status: "live"
           }
         ]);
 
       if (error) {
-        showError("Post error: " + error.message);
+        showMessage("Post error: " + error.message);
         return;
       }
 
-      document.getElementById("name").value = "";
-      document.getElementById("code").value = "";
+      showMessage("Server posted.", "success");
+      nameInput.value = "";
+      codeInput.value = "";
 
-      loadServers();
+      await loadServers();
     }
 
-    document.getElementById("postBtn").addEventListener("click", addServer);
+    postBtn.addEventListener("click", addServer);
 
     loadServers();
   </script>
 </body>
-</html>  data.forEach(s => {
-    list.innerHTML += `
-      <div class="server">
-        <b>${s.server_name}</b><br>
-        Code: ${s.invite_code}
-      </div>
-    `
-  })
-}
-
-loadServers()
-</script>
+</html>
