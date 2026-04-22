@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Windrose Server Finder</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      display: block;
+      width: 100%;
+      max-width: 320px;
+    }
+    .server {
+      border: 1px solid #333;
+      padding: 10px;
+      margin-top: 10px;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Windrose Server Finder</h1>
+
+  <h2>Post Server</h2>
+  <input id="name" placeholder="Server Name">
+  <input id="code" placeholder="Invite Code">
+  <button onclick="addServer()">Post</button>
+
+  <h2>Servers</h2>
+  <div id="list"></div>
+
+  <script>
+    let servers = [];
+
+    function addServer() {
+      const name = document.getElementById("name").value.trim();
+      const code = document.getElementById("code").value.trim();
+
+      if (!name || !code) {
+        alert("Fill everything");
+        return;
+      }
+
+      servers.push({ name, code });
+      render();
+
+      document.getElementById("name").value = "";
+      document.getElementById("code").value = "";
+    }
+
+    function render() {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      servers.forEach(s => {
+        list.innerHTML += `
+          <div class="server">
+            <b>${s.name}</b><br>
+            Code: ${s.code}
+          </div>
+        `;
+      });
+    }
+  </script>
+</body>
+</html>
