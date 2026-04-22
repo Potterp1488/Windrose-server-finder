@@ -23,7 +23,6 @@
     }
 
     * { box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -92,7 +91,8 @@
     .favorite-btn,
     .copy-btn,
     .refresh-btn,
-    .clear-btn {
+    .clear-btn,
+    .delete-btn {
       border: none;
       border-radius: 14px;
       cursor: pointer;
@@ -105,7 +105,8 @@
     .clear-btn,
     .copy-btn,
     .favorite-btn,
-    .ghost-btn {
+    .ghost-btn,
+    .delete-btn {
       background: rgba(255, 255, 255, 0.04);
       color: var(--text);
       border: 1px solid var(--border);
@@ -121,6 +122,11 @@
       box-shadow: 0 12px 30px rgba(149, 102, 255, 0.24);
     }
 
+    .delete-btn {
+      border-color: rgba(255, 87, 133, 0.24);
+      color: #ffd3df;
+    }
+
     .about-btn:hover,
     .primary-btn:hover,
     .secondary-btn:hover,
@@ -130,7 +136,8 @@
     .favorite-btn:hover,
     .copy-btn:hover,
     .refresh-btn:hover,
-    .clear-btn:hover {
+    .clear-btn:hover,
+    .delete-btn:hover {
       transform: translateY(-1px);
       filter: brightness(1.05);
     }
@@ -151,7 +158,6 @@
       align-items: start;
     }
 
-    .card,
     .panel,
     .stats-card {
       background: linear-gradient(180deg, rgba(15, 24, 50, 0.96), rgba(10, 19, 41, 0.96));
@@ -197,9 +203,7 @@
     .stats-icon.filter { color: #d06bff; background: rgba(201, 83, 200, 0.13); border-color: rgba(201, 83, 200, 0.22); }
     .stats-icon.tag { color: #b39eff; background: rgba(139, 92, 246, 0.13); border-color: rgba(139, 92, 246, 0.22); }
 
-    .panel {
-      padding: 22px;
-    }
+    .panel { padding: 22px; }
 
     .panel-head {
       display: flex;
@@ -237,9 +241,7 @@
 
     .search-input::placeholder,
     .field input::placeholder,
-    .field textarea::placeholder {
-      color: #7f8caf;
-    }
+    .field textarea::placeholder { color: #7f8caf; }
 
     .search-input:focus,
     .field input:focus,
@@ -405,9 +407,7 @@
       font-weight: 700;
     }
 
-    .mini-tag {
-      cursor: pointer;
-    }
+    .mini-tag { cursor: pointer; }
 
     .mini-tag.active {
       background: linear-gradient(135deg, rgba(109, 124, 255, 0.22), rgba(201, 83, 200, 0.16));
@@ -469,9 +469,7 @@
       font-size: 14px;
     }
 
-    .favorites-toggle {
-      margin-bottom: 14px;
-    }
+    .favorites-toggle { margin-bottom: 14px; }
 
     @media (max-width: 1080px) {
       .main-grid { grid-template-columns: 1fr; }
@@ -480,9 +478,7 @@
     @media (max-width: 780px) {
       .stats-grid,
       .toolbar,
-      .search-block {
-        grid-template-columns: 1fr;
-      }
+      .search-block { grid-template-columns: 1fr; }
 
       .server-top,
       .topbar {
@@ -491,7 +487,6 @@
       }
 
       .stats-value { font-size: 38px; }
-
       .brand { font-size: 22px; }
     }
   </style>
@@ -702,6 +697,36 @@
       applyFilters();
     }
 
+    function generateOwnerToken() {
+      const array = new Uint8Array(32);
+      crypto.getRandomValues(array);
+      return Array.from(array, b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function sha256(text) {
+      const data = new TextEncoder().encode(text);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function getOwnedPosts() {
+      try {
+        return JSON.parse(localStorage.getItem("windroseOwnedPosts") || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveOwnedPosts(map) {
+      localStorage.setItem("windroseOwnedPosts", JSON.stringify(map));
+    }
+
+    function userOwnsPost(serverId) {
+      const owned = getOwnedPosts();
+      return !!owned[serverId];
+    }
+
     function normalizeTags(tags) {
       if (!tags) return [];
 
@@ -842,6 +867,7 @@
       serverListEl.innerHTML = filteredServers.map(server => {
         const tags = normalizeTags(server.tags);
         const favorite = isFavorite(server.id);
+        const owned = userOwnsPost(server.id);
         const statusClass = server.modded ? 'modded' : 'vanilla';
         const statusLabel = server.modded ? 'Modded' : 'Vanilla';
         const createdAt = server.created_at ? new Date(server.created_at).toLocaleDateString() : 'Unknown';
@@ -873,6 +899,7 @@
             <div class="server-actions">
               <button class="copy-btn" type="button" data-copy="${escapeHtml(server.invite_code || '')}">⧉ Copy Invite Code</button>
               <button class="favorite-btn ${favorite ? 'active' : ''}" type="button" data-favorite="${escapeHtml(server.id || '')}">${favorite ? '★ Favorited' : '☆ Favorite'}</button>
+              ${owned ? `<button class="delete-btn" type="button" data-delete="${escapeHtml(server.id || '')}">🗑 Delete</button>` : ''}
               <div class="invite-code">Invite Code: <strong>${escapeHtml(server.invite_code || '')}</strong></div>
             </div>
           </article>
@@ -907,6 +934,12 @@
           toggleFavorite(btn.dataset.favorite);
         });
       });
+
+      serverListEl.querySelectorAll("[data-delete]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          deleteServer(btn.dataset.delete);
+        });
+      });
     }
 
     async function loadServers() {
@@ -933,13 +966,17 @@
       showStatus('Posting server...', 'success');
 
       const formData = new FormData(serverFormEl);
+      const ownerToken = generateOwnerToken();
+      const ownerTokenHash = await sha256(ownerToken);
+
       const payload = {
         name: String(formData.get('name') || '').trim(),
         description: String(formData.get('description') || '').trim(),
         invite_code: String(formData.get('invite_code') || '').trim(),
         max_players: formData.get('max_players') ? Number(formData.get('max_players')) : null,
         modded: String(formData.get('modded')) === 'true',
-        tags: normalizeTags(formData.get('tags'))
+        tags: normalizeTags(formData.get('tags')),
+        owner_token_hash: ownerTokenHash
       };
 
       if (!payload.name || !payload.invite_code) {
@@ -947,7 +984,11 @@
         return;
       }
 
-      const { error } = await client.from(TABLE_NAME).insert([payload]);
+      const { data, error } = await client
+        .from(TABLE_NAME)
+        .insert([payload])
+        .select('id')
+        .single();
 
       if (error) {
         console.error(error);
@@ -955,8 +996,44 @@
         return;
       }
 
+      if (data?.id) {
+        const owned = getOwnedPosts();
+        owned[data.id] = ownerToken;
+        saveOwnedPosts(owned);
+      }
+
       serverFormEl.reset();
       showStatus('Server posted successfully.', 'success');
+      await loadServers();
+    }
+
+    async function deleteServer(id) {
+      const owned = getOwnedPosts();
+      const ownerToken = owned[id];
+
+      if (!ownerToken) {
+        alert('You can only delete posts created from this browser.');
+        return;
+      }
+
+      if (!confirm('Delete this server?')) return;
+
+      const ownerTokenHash = await sha256(ownerToken);
+
+      const { error } = await client
+        .from(TABLE_NAME)
+        .delete()
+        .eq('id', id)
+        .eq('owner_token_hash', ownerTokenHash);
+
+      if (error) {
+        console.error(error);
+        alert('Failed to delete server.');
+        return;
+      }
+
+      delete owned[id];
+      saveOwnedPosts(owned);
       await loadServers();
     }
 
