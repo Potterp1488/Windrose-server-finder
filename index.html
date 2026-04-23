@@ -1,135 +1,544 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Windrose Server Finder</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Windrose Server Finder</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-body {
-  margin:0;
-  font-family:Arial;
-  background:#0b1020;
-  color:white;
-}
+  <style>
+    * { box-sizing: border-box; }
 
-.wrap { max-width:1200px; margin:auto; padding:20px; }
-
-.tag-list { display:flex; flex-wrap:wrap; gap:10px; }
-
-.tag-chip {
-  padding:10px 14px;
-  background:#1b2a4d;
-  border-radius:10px;
-  cursor:pointer;
-}
-.tag-chip.active { background:#6d7cff; }
-
-button { cursor:pointer; }
-
-.server { border:1px solid #333; padding:10px; margin:10px 0; }
-</style>
-</head>
-
-<body>
-
-<div class="wrap">
-
-<h1>Windrose Server Finder</h1>
-
-<!-- POST FORM -->
-<form id="form">
-<input name="name" placeholder="Server Name" required><br><br>
-<input name="invite_code" placeholder="Invite Code" required><br><br>
-<input name="max_players" type="number" placeholder="Max Players" required><br><br>
-
-<div id="postTags" class="tag-list"></div>
-
-<button type="submit">Post Server</button>
-</form>
-
-<hr>
-
-<div id="servers"></div>
-
-</div>
-
-<script>
-
-const SUPABASE_URL = "YOUR_URL";
-const SUPABASE_KEY = "YOUR_KEY";
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let selectedTags = [];
-
-const TAGS = [
-"new player friendly","roleplay","modded","vanilla","chill","hardcore",
-"pve","survival","events","loot boosted","low pop","high pop",
-"no wipe","community"
-];
-
-function renderTagButtons() {
-  const el = document.getElementById("postTags");
-  el.innerHTML = TAGS.map(tag => `
-    <div class="tag-chip ${selectedTags.includes(tag) ? "active":""}" onclick="toggleTag('${tag}')">
-      ${tag}
-    </div>
-  `).join("");
-}
-
-function toggleTag(tag) {
-  if (selectedTags.includes(tag)) {
-    selectedTags = selectedTags.filter(t=>t!==tag);
-  } else {
-    if (selectedTags.length >= 5) {
-      alert("Max 5 tags");
-      return;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0b1020, #111933);
+      color: white;
     }
-    selectedTags.push(tag);
-  }
-  renderTagButtons();
-}
 
-async function loadServers() {
-  const { data } = await db.from("servers").select("*").order("created_at",{ascending:false});
-  const el = document.getElementById("servers");
+    .wrap {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
 
-  el.innerHTML = data.map(s=>`
-    <div class="server">
-      <b>${s.name}</b><br>
-      ${s.max_players} players<br>
-      ${s.tags?.join(", ") || ""}<br>
-      ${s.invite_code}
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 36px;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(8px);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 22px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+    .col-3 { grid-column: span 3; }
+
+    @media (max-width: 800px) {
+      .col-6, .col-4, .col-3 { grid-column: span 12; }
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #2d3f70;
+      background: #111a33;
+      color: white;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input::placeholder {
+      color: #aab4d6;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .primary-btn {
+      background: #6d7cff;
+      color: white;
+    }
+
+    .primary-btn:hover {
+      background: #8490ff;
+    }
+
+    .secondary-btn {
+      background: #23345f;
+      color: white;
+    }
+
+    .secondary-btn:hover {
+      background: #30467e;
+    }
+
+    .danger-btn {
+      background: #c93d3d;
+      color: white;
+    }
+
+    .danger-btn:hover {
+      background: #de4b4b;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .tag-chip {
+      padding: 10px 14px;
+      background: #1b2a4d;
+      border: 1px solid #30467e;
+      border-radius: 999px;
+      cursor: pointer;
+      user-select: none;
+      transition: 0.2s ease;
+      font-size: 14px;
+    }
+
+    .tag-chip:hover {
+      background: #243865;
+    }
+
+    .tag-chip.active {
+      background: #6d7cff;
+      border-color: #6d7cff;
+    }
+
+    .muted {
+      color: #b9c4e6;
+      font-size: 14px;
+    }
+
+    .server-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .server {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .server h3 {
+      margin: 0 0 10px 0;
+      font-size: 20px;
+    }
+
+    .server-info {
+      margin-bottom: 10px;
+      line-height: 1.6;
+      color: #d6def8;
+    }
+
+    .server-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .server-tag {
+      background: #1a2748;
+      color: #dce5ff;
+      border: 1px solid #2e4278;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .server-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px 10px;
+      color: #b9c4e6;
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      margin: 22px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Windrose Server Finder</h1>
+
+    <!-- SEARCH -->
+    <div class="panel">
+      <h2>Search Servers</h2>
+
+      <div class="row">
+        <div class="col-12">
+          <input id="searchInput" type="text" placeholder="Search by server name, invite code, or tags..." />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <div id="searchTags" class="tag-list"></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="primary-btn" id="searchBtn" type="button">Search</button>
+        <button class="secondary-btn" id="clearSearchBtn" type="button">Clear Filters</button>
+      </div>
     </div>
-  `).join("");
-}
 
-document.getElementById("form").onsubmit = async (e)=>{
-  e.preventDefault();
+    <!-- POST -->
+    <div class="panel">
+      <h2>Post Your Server</h2>
 
-  const form = new FormData(e.target);
+      <form id="form">
+        <div class="row">
+          <div class="col-6">
+            <input name="poster_name" placeholder="Your Name" required />
+          </div>
+          <div class="col-6">
+            <input name="name" placeholder="Server Name" required />
+          </div>
+        </div>
 
-  const payload = {
-    name: form.get("name"),
-    invite_code: form.get("invite_code"),
-    max_players: Number(form.get("max_players")),
-    tags: selectedTags
-  };
+        <div class="row">
+          <div class="col-6">
+            <input name="invite_code" placeholder="Invite Code / Join Info" required />
+          </div>
+          <div class="col-6">
+            <input name="max_players" type="number" min="1" placeholder="Max Players" required />
+          </div>
+        </div>
 
-  await db.from("servers").insert([payload]);
+        <div class="row">
+          <div class="col-12">
+            <div id="postTags" class="tag-list"></div>
+          </div>
+        </div>
 
-  selectedTags = [];
-  e.target.reset();
-  renderTagButtons();
-  loadServers();
-};
+        <div class="muted">Choose up to 5 tags</div>
 
-renderTagButtons();
-loadServers();
+        <div class="btn-row">
+          <button class="primary-btn" type="submit">Post Server</button>
+        </div>
+      </form>
+    </div>
 
-</script>
+    <!-- RESULTS -->
+    <div class="panel">
+      <h2>Server Listings</h2>
+      <div id="servers"></div>
+    </div>
+  </div>
 
+  <script>
+    const SUPABASE_URL = "YOUR_URL";
+    const SUPABASE_KEY = "YOUR_KEY";
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const TAGS = [
+      "new player friendly",
+      "roleplay",
+      "modded",
+      "vanilla",
+      "chill",
+      "hardcore",
+      "pve",
+      "pvp",
+      "survival",
+      "events",
+      "loot boosted",
+      "low loot",
+      "low pop",
+      "high pop",
+      "no wipe",
+      "weekly wipe",
+      "monthly wipe",
+      "community",
+      "solo friendly",
+      "duo friendly",
+      "trio friendly",
+      "factions",
+      "base building",
+      "raiding",
+      "custom map",
+      "active admins",
+      "economy",
+      "beginner friendly",
+      "competitive",
+      "full send"
+    ];
+
+    let selectedPostTags = [];
+    let selectedSearchTags = [];
+    let allServers = [];
+
+    let ownerToken = localStorage.getItem("windrose_owner_token");
+    if (!ownerToken) {
+      ownerToken = crypto.randomUUID();
+      localStorage.setItem("windrose_owner_token", ownerToken);
+    }
+
+    function safeHtml(text) {
+      if (text === null || text === undefined) return "";
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function renderPostTagButtons() {
+      const el = document.getElementById("postTags");
+      el.innerHTML = TAGS.map(tag => `
+        <div class="tag-chip ${selectedPostTags.includes(tag) ? "active" : ""}" onclick="togglePostTag('${tag.replaceAll("'", "\\'")}')">
+          ${safeHtml(tag)}
+        </div>
+      `).join("");
+    }
+
+    function renderSearchTagButtons() {
+      const el = document.getElementById("searchTags");
+      el.innerHTML = TAGS.map(tag => `
+        <div class="tag-chip ${selectedSearchTags.includes(tag) ? "active" : ""}" onclick="toggleSearchTag('${tag.replaceAll("'", "\\'")}')">
+          ${safeHtml(tag)}
+        </div>
+      `).join("");
+    }
+
+    function togglePostTag(tag) {
+      if (selectedPostTags.includes(tag)) {
+        selectedPostTags = selectedPostTags.filter(t => t !== tag);
+      } else {
+        if (selectedPostTags.length >= 5) {
+          alert("Max 5 tags");
+          return;
+        }
+        selectedPostTags.push(tag);
+      }
+      renderPostTagButtons();
+    }
+
+    function toggleSearchTag(tag) {
+      if (selectedSearchTags.includes(tag)) {
+        selectedSearchTags = selectedSearchTags.filter(t => t !== tag);
+      } else {
+        selectedSearchTags.push(tag);
+      }
+      renderSearchTagButtons();
+      applyFilters();
+    }
+
+    async function loadServers() {
+      const { data, error } = await db
+        .from("servers")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        document.getElementById("servers").innerHTML = `
+          <div class="empty">Error loading servers: ${safeHtml(error.message)}</div>
+        `;
+        return;
+      }
+
+      allServers = data || [];
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const searchText = document.getElementById("searchInput").value.trim().toLowerCase();
+
+      const filtered = allServers.filter(server => {
+        const name = (server.name || "").toLowerCase();
+        const invite = (server.invite_code || "").toLowerCase();
+        const poster = (server.poster_name || "").toLowerCase();
+        const tags = Array.isArray(server.tags) ? server.tags : [];
+        const tagsText = tags.join(" ").toLowerCase();
+
+        const textMatch =
+          !searchText ||
+          name.includes(searchText) ||
+          invite.includes(searchText) ||
+          poster.includes(searchText) ||
+          tagsText.includes(searchText);
+
+        const tagMatch =
+          selectedSearchTags.length === 0 ||
+          selectedSearchTags.every(tag => tags.includes(tag));
+
+        return textMatch && tagMatch;
+      });
+
+      renderServers(filtered);
+    }
+
+    function renderServers(list) {
+      const el = document.getElementById("servers");
+
+      if (!list.length) {
+        el.innerHTML = `<div class="empty">No servers found.</div>`;
+        return;
+      }
+
+      el.innerHTML = `
+        <div class="server-grid">
+          ${list.map(server => {
+            const tags = Array.isArray(server.tags) ? server.tags : [];
+            const canDelete = server.owner_token && server.owner_token === ownerToken;
+
+            return `
+              <div class="server">
+                <h3>${safeHtml(server.name)}</h3>
+
+                <div class="server-info">
+                  <div><strong>Posted by:</strong> ${safeHtml(server.poster_name || "Unknown")}</div>
+                  <div><strong>Max Players:</strong> ${safeHtml(server.max_players || "")}</div>
+                  <div><strong>Join Info:</strong> ${safeHtml(server.invite_code || "")}</div>
+                </div>
+
+                <div class="server-tags">
+                  ${tags.length
+                    ? tags.map(tag => `<span class="server-tag">${safeHtml(tag)}</span>`).join("")
+                    : `<span class="server-tag">no tags</span>`
+                  }
+                </div>
+
+                <div class="server-footer">
+                  ${canDelete
+                    ? `<button class="danger-btn" onclick="deleteServer('${server.id}')">Delete</button>`
+                    : `<span class="muted">Only poster can delete</span>`
+                  }
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    async function deleteServer(id) {
+      const server = allServers.find(s => String(s.id) === String(id));
+      if (!server) return;
+
+      if (server.owner_token !== ownerToken) {
+        alert("You can only delete your own posts.");
+        return;
+      }
+
+      const ok = confirm("Delete this server post?");
+      if (!ok) return;
+
+      const { error } = await db
+        .from("servers")
+        .delete()
+        .eq("id", id)
+        .eq("owner_token", ownerToken);
+
+      if (error) {
+        alert("Delete failed: " + error.message);
+        return;
+      }
+
+      await loadServers();
+    }
+
+    document.getElementById("form").onsubmit = async (e) => {
+      e.preventDefault();
+
+      const form = new FormData(e.target);
+
+      const payload = {
+        poster_name: form.get("poster_name"),
+        name: form.get("name"),
+        invite_code: form.get("invite_code"),
+        max_players: Number(form.get("max_players")),
+        tags: selectedPostTags,
+        owner_token: ownerToken
+      };
+
+      const { error } = await db.from("servers").insert([payload]);
+
+      if (error) {
+        alert("Post failed: " + error.message);
+        return;
+      }
+
+      selectedPostTags = [];
+      e.target.reset();
+      renderPostTagButtons();
+      await loadServers();
+    };
+
+    document.getElementById("searchBtn").addEventListener("click", applyFilters);
+
+    document.getElementById("clearSearchBtn").addEventListener("click", () => {
+      document.getElementById("searchInput").value = "";
+      selectedSearchTags = [];
+      renderSearchTagButtons();
+      applyFilters();
+    });
+
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+
+    renderPostTagButtons();
+    renderSearchTagButtons();
+    loadServers();
+
+    window.togglePostTag = togglePostTag;
+    window.toggleSearchTag = toggleSearchTag;
+    window.deleteServer = deleteServer;
+  </script>
 </body>
 </html>
