@@ -16,8 +16,6 @@
       --border: rgba(255,255,255,0.06);
       --text: #f4f7ff;
       --muted: #a8b3d1;
-      --chip: #14284a;
-      --chip-hover: #1b3560;
       --blue: #5e7cff;
       --purple: #c54cff;
       --cyan: #45d8d0;
@@ -217,46 +215,6 @@
       background: #3b2f77;
     }
 
-    .section-label {
-      font-size: 15px;
-      font-weight: 800;
-      color: #dce4ff;
-      margin: 12px 0 12px;
-    }
-
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
-      min-height: 48px;
-    }
-
-    .tag-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--chip);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: white;
-      padding: 11px 15px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .tag-chip:hover {
-      background: var(--chip-hover);
-    }
-
-    .tag-chip.active {
-      background: linear-gradient(135deg, rgba(94,124,255,0.96), rgba(197,76,255,0.96));
-      border-color: transparent;
-    }
-
     .filters {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -268,6 +226,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      min-height: 280px;
     }
 
     .server-card {
@@ -319,22 +278,6 @@
       background: rgba(255,255,255,0.05);
       color: #d8e0fb;
       padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .tag-pill-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .small-tag {
-      background: rgba(255,255,255,0.05);
-      color: #dce4ff;
-      padding: 9px 12px;
       border-radius: 12px;
       font-size: 14px;
       font-weight: 700;
@@ -407,7 +350,7 @@
         <div class="brand-icon">✦</div>
         <div>Windrose Server Finder</div>
       </div>
-      <button class="about-btn">ⓘ About</button>
+      <button class="about-btn" type="button">ⓘ About</button>
     </div>
 
     <div class="stats-wrap">
@@ -430,10 +373,10 @@
 
         <div class="stat-card">
           <div>
-            <div class="stat-label">Selected Tags</div>
-            <div class="stat-value" id="selectedTagCount">0</div>
+            <div class="stat-label">Active Filters</div>
+            <div class="stat-value" id="activeFilterCount">0</div>
           </div>
-          <div class="stat-icon" style="color:#b98bff;background:rgba(125,77,255,0.12);border-color:rgba(125,77,255,0.14);">🏷</div>
+          <div class="stat-icon" style="color:#b98bff;background:rgba(125,77,255,0.12);border-color:rgba(125,77,255,0.14);">⚙</div>
         </div>
       </div>
     </div>
@@ -443,16 +386,13 @@
         <div class="panel-title">Find a Server</div>
 
         <div class="search-top">
-          <input id="searchInput" type="text" placeholder="Search by name, description, tag, or invite code" />
+          <input id="searchInput" type="text" placeholder="Search by name, description, or invite code" />
           <div class="search-actions">
             <button class="btn btn-refresh" id="refreshBtn" type="button">Refresh</button>
             <button class="btn btn-search" id="searchBtn" type="button">Search</button>
             <button class="btn btn-clear" id="clearBtn" type="button">Clear Filters</button>
           </div>
         </div>
-
-        <div class="section-label">Quick Tags</div>
-        <div id="quickTags" class="tag-row"></div>
 
         <div class="filters">
           <div>
@@ -533,11 +473,6 @@
 
           <div class="spacer-16"></div>
 
-          <div>
-            <label>Click Tags</label>
-            <div id="postTags" class="tag-row"></div>
-          </div>
-
           <button class="btn btn-post" type="submit">Post Server</button>
         </form>
       </div>
@@ -555,31 +490,7 @@
     const SUPABASE_KEY = "YOUR_KEY";
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const TAGS = [
-      "New Player Friendly",
-      "Roleplay",
-      "Modded",
-      "Vanilla",
-      "Chill / Casual",
-      "Hardcore",
-      "PvE",
-      "PvP",
-      "Survival",
-      "Events",
-      "Loot Boosted",
-      "Low Pop",
-      "High Pop",
-      "Community",
-      "Weekly Wipe",
-      "Solo Friendly",
-      "Base Building",
-      "Raiding",
-      "Active Admins"
-    ];
-
     let allServers = [];
-    let selectedSearchTags = [];
-    let selectedPostTags = [];
 
     function escapeHtml(text) {
       if (text === null || text === undefined) return "";
@@ -596,51 +507,13 @@
       return new Date(dateStr).toLocaleDateString();
     }
 
-    function normalizeTags(tags) {
-      if (!Array.isArray(tags)) return [];
-      return tags.map(t => String(t).trim()).filter(Boolean);
-    }
-
-    function renderTagGroup(targetId, selectedArray, clickHandlerName) {
-      const box = document.getElementById(targetId);
-      if (!box) return;
-
-      box.innerHTML = TAGS.map(tag => {
-        const active = selectedArray.includes(tag) ? "active" : "";
-        return `<button type="button" class="tag-chip ${active}" onclick="${clickHandlerName}(${JSON.stringify(tag)})">${escapeHtml(tag)}</button>`;
-      }).join("");
-    }
-
-    function renderSearchTags() {
-      renderTagGroup("quickTags", selectedSearchTags, "toggleSearchTag");
-      document.getElementById("selectedTagCount").textContent = selectedSearchTags.length;
-    }
-
-    function renderPostTags() {
-      renderTagGroup("postTags", selectedPostTags, "togglePostTag");
-    }
-
-    function toggleSearchTag(tag) {
-      if (selectedSearchTags.includes(tag)) {
-        selectedSearchTags = selectedSearchTags.filter(t => t !== tag);
-      } else {
-        selectedSearchTags.push(tag);
-      }
-      renderSearchTags();
-      applyFilters();
-    }
-
-    function togglePostTag(tag) {
-      if (selectedPostTags.includes(tag)) {
-        selectedPostTags = selectedPostTags.filter(t => t !== tag);
-      } else {
-        if (selectedPostTags.length >= 5) {
-          alert("Max 5 tags");
-          return;
-        }
-        selectedPostTags.push(tag);
-      }
-      renderPostTags();
+    function updateFilterCount() {
+      let count = 0;
+      if (document.getElementById("searchInput").value.trim()) count++;
+      if (document.getElementById("typeFilter").value) count++;
+      if (document.getElementById("playersFilter").value) count++;
+      if (document.getElementById("sortSelect").value !== "newest") count++;
+      document.getElementById("activeFilterCount").textContent = count;
     }
 
     async function loadServers() {
@@ -659,11 +532,7 @@
         return;
       }
 
-      allServers = (data || []).map(server => ({
-        ...server,
-        tags: normalizeTags(server.tags)
-      }));
-
+      allServers = data || [];
       document.getElementById("totalServers").textContent = allServers.length;
       applyFilters();
     }
@@ -679,24 +548,18 @@
         const desc = (server.description || "").toLowerCase();
         const invite = (server.invite_code || "").toLowerCase();
         const type = (server.server_type || "").toLowerCase();
-        const tags = normalizeTags(server.tags);
-        const tagText = tags.join(" ").toLowerCase();
         const maxPlayers = Number(server.max_players || 0);
 
         const matchesSearch =
           !search ||
           name.includes(search) ||
           desc.includes(search) ||
-          invite.includes(search) ||
-          tagText.includes(search);
+          invite.includes(search);
 
         const matchesType = !typeFilter || type === typeFilter;
         const matchesPlayers = !playersFilter || maxPlayers >= Number(playersFilter);
-        const matchesTags =
-          selectedSearchTags.length === 0 ||
-          selectedSearchTags.every(tag => tags.includes(tag));
 
-        return matchesSearch && matchesType && matchesPlayers && matchesTags;
+        return matchesSearch && matchesType && matchesPlayers;
       });
 
       if (sortValue === "newest") {
@@ -714,6 +577,7 @@
       }
 
       document.getElementById("filteredServers").textContent = filtered.length;
+      updateFilterCount();
       renderServers(filtered);
     }
 
@@ -731,7 +595,6 @@
       }
 
       box.innerHTML = servers.map(server => {
-        const tags = normalizeTags(server.tags);
         const type = server.server_type || "unknown";
         const desc = server.description && server.description.trim()
           ? server.description
@@ -751,13 +614,6 @@
             <div class="meta-row">
               <div class="meta-pill">${escapeHtml(server.max_players ? server.max_players + " Players" : "No Player Limit Set")}</div>
               <div class="meta-pill">Posted ${escapeHtml(formatDate(server.created_at))}</div>
-            </div>
-
-            <div class="tag-pill-wrap">
-              ${tags.length
-                ? tags.map(tag => `<div class="small-tag">${escapeHtml(tag)}</div>`).join("")
-                : `<div class="small-tag">No Tags</div>`
-              }
             </div>
 
             <div class="card-bottom">
@@ -788,8 +644,7 @@
         description: form.get("description"),
         invite_code: form.get("invite_code"),
         max_players: Number(form.get("max_players")),
-        server_type: form.get("server_type"),
-        tags: selectedPostTags
+        server_type: form.get("server_type")
       };
 
       const { error } = await db.from("servers").insert([payload]);
@@ -800,8 +655,6 @@
       }
 
       e.target.reset();
-      selectedPostTags = [];
-      renderPostTags();
       loadServers();
     });
 
@@ -817,17 +670,11 @@
       document.getElementById("sortSelect").value = "newest";
       document.getElementById("typeFilter").value = "";
       document.getElementById("playersFilter").value = "";
-      selectedSearchTags = [];
-      renderSearchTags();
       applyFilters();
     });
 
-    window.toggleSearchTag = toggleSearchTag;
-    window.togglePostTag = togglePostTag;
     window.copyInvite = copyInvite;
 
-    renderSearchTags();
-    renderPostTags();
     loadServers();
   </script>
 </body>
