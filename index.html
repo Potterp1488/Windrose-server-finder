@@ -10,28 +10,29 @@
     * { box-sizing: border-box; }
 
     :root {
-      --bg: #050d1d;
-      --panel: #09162d;
-      --panel-2: #0b1b36;
-      --border: rgba(110, 146, 255, 0.14);
-      --soft-border: rgba(255,255,255,0.05);
-      --text: #f3f6ff;
-      --muted: #9aa8c7;
-      --chip: #132544;
-      --blue: #5f78ff;
-      --purple: #b04dff;
-      --shadow: 0 10px 30px rgba(0,0,0,0.28);
+      --bg: #061120;
+      --panel: #0a1730;
+      --panel2: #0d1d3a;
+      --border: rgba(255,255,255,0.06);
+      --text: #f4f7ff;
+      --muted: #a8b3d1;
+      --chip: #14284a;
+      --chip-hover: #1b3560;
+      --blue: #5e7cff;
+      --purple: #c54cff;
+      --cyan: #45d8d0;
+      --shadow: 0 10px 28px rgba(0,0,0,0.28);
     }
 
     body {
       margin: 0;
-      font-family: Inter, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(85,112,255,0.12), transparent 24%),
-        radial-gradient(circle at top right, rgba(176,77,255,0.10), transparent 22%),
-        linear-gradient(180deg, #040b18 0%, #071327 100%);
+      font-family: Arial, sans-serif;
       color: var(--text);
-      padding: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(94,124,255,0.10), transparent 25%),
+        radial-gradient(circle at top right, rgba(197,76,255,0.10), transparent 22%),
+        linear-gradient(180deg, #040b18 0%, #091427 100%);
+      padding: 22px;
     }
 
     .container {
@@ -43,6 +44,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
       margin-bottom: 18px;
     }
 
@@ -60,80 +62,83 @@
       border-radius: 12px;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, rgba(95,120,255,0.25), rgba(176,77,255,0.25));
+      background: linear-gradient(135deg, rgba(94,124,255,0.22), rgba(197,76,255,0.22));
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       font-size: 20px;
     }
 
     .about-btn {
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      border: 1px solid var(--soft-border);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: white;
       border-radius: 14px;
       padding: 12px 18px;
       font-weight: 700;
       cursor: pointer;
     }
 
+    .stats-wrap {
+      background: rgba(8,16,34,0.72);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 12px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
-      margin-bottom: 18px;
-      padding: 12px;
-      background: rgba(7,16,34,0.72);
-      border: 1px solid var(--soft-border);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
     }
 
     .stat-card {
-      background: linear-gradient(180deg, rgba(12,28,57,0.96), rgba(8,20,42,0.96));
-      border: 1px solid var(--soft-border);
+      background: linear-gradient(180deg, rgba(11,27,53,0.96), rgba(8,19,38,0.96));
+      border: 1px solid var(--border);
       border-radius: 18px;
       padding: 22px;
+      min-height: 115px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      min-height: 120px;
     }
 
     .stat-label {
       color: var(--muted);
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 10px;
     }
 
     .stat-value {
-      font-size: 56px;
+      font-size: 54px;
       font-weight: 800;
       line-height: 1;
     }
 
     .stat-icon {
-      width: 64px;
-      height: 64px;
+      width: 62px;
+      height: 62px;
       border-radius: 18px;
       display: grid;
       place-items: center;
-      font-size: 28px;
-      background: rgba(95,120,255,0.12);
-      border: 1px solid rgba(95,120,255,0.16);
-      color: #7fa0ff;
+      font-size: 26px;
+      background: rgba(94,124,255,0.12);
+      border: 1px solid rgba(94,124,255,0.14);
+      color: #84a0ff;
     }
 
     .layout {
       display: grid;
-      grid-template-columns: 1.65fr 1fr;
+      grid-template-columns: 1.6fr 1fr;
       gap: 18px;
       margin-bottom: 18px;
     }
 
     .panel {
-      background: linear-gradient(180deg, rgba(8,21,44,0.96), rgba(7,18,37,0.96));
-      border: 1px solid var(--soft-border);
+      background: linear-gradient(180deg, rgba(9,23,46,0.96), rgba(8,19,38,0.96));
+      border: 1px solid var(--border);
       border-radius: 22px;
       padding: 22px;
       box-shadow: var(--shadow);
@@ -147,76 +152,76 @@
 
     .search-top {
       display: grid;
-      grid-template-columns: minmax(0, 520px) auto;
-      gap: 12px;
-      margin-bottom: 16px;
+      grid-template-columns: minmax(0, 1fr) 112px;
+      gap: 10px;
       align-items: start;
+      margin-bottom: 18px;
     }
 
     .search-actions {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      width: 130px;
     }
 
     input, textarea, select {
       width: 100%;
-      background: #0f1d37;
-      color: var(--text);
+      background: #10203c;
+      color: white;
       border: 1px solid rgba(255,255,255,0.05);
       outline: none;
       border-radius: 14px;
-      padding: 16px 16px;
+      padding: 15px 16px;
       font-size: 16px;
     }
 
     textarea {
-      min-height: 128px;
+      min-height: 120px;
       resize: vertical;
     }
 
     input::placeholder,
     textarea::placeholder {
-      color: #8291b3;
+      color: #8d9abc;
     }
 
     label {
       display: block;
       margin-bottom: 8px;
+      color: #dce4ff;
       font-weight: 700;
-      color: #dce5ff;
     }
 
     .btn {
       border: none;
       border-radius: 14px;
-      padding: 15px 18px;
-      font-size: 16px;
+      padding: 13px 12px;
+      font-size: 15px;
       font-weight: 800;
-      cursor: pointer;
       color: white;
+      cursor: pointer;
       width: 100%;
+      min-height: 48px;
     }
 
     .btn-refresh {
-      background: #213253;
+      background: #263b63;
     }
 
     .btn-search,
     .btn-post {
-      background: linear-gradient(90deg, #5f78ff, #cc4bcf);
+      background: linear-gradient(90deg, #5e7cff, #d44dcb);
     }
 
     .btn-clear {
-      background: #27225f;
+      background: #3b2f77;
     }
 
     .section-label {
       font-size: 15px;
       font-weight: 800;
-      color: #dce5ff;
-      margin: 18px 0 12px;
+      color: #dce4ff;
+      margin: 12px 0 12px;
     }
 
     .tag-row {
@@ -224,32 +229,31 @@
       flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 18px;
+      min-height: 48px;
     }
 
     .tag-chip {
-      border: 1px solid rgba(255,255,255,0.06);
-      background: #132544;
-      color: #f3f6ff;
-      padding: 11px 14px;
-      border-radius: 14px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 14px;
-      transition: 0.18s ease;
-      user-select: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 44px;
+      background: var(--chip);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: white;
+      padding: 11px 15px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+      white-space: nowrap;
     }
 
     .tag-chip:hover {
-      transform: translateY(-1px);
-      background: #193154;
+      background: var(--chip-hover);
     }
 
     .tag-chip.active {
-      background: linear-gradient(135deg, rgba(95,120,255,0.95), rgba(176,77,255,0.95));
+      background: linear-gradient(135deg, rgba(94,124,255,0.96), rgba(197,76,255,0.96));
       border-color: transparent;
     }
 
@@ -267,7 +271,7 @@
     }
 
     .server-card {
-      background: linear-gradient(180deg, rgba(15,29,55,0.95), rgba(11,24,47,0.95));
+      background: linear-gradient(180deg, rgba(15,30,57,0.95), rgba(11,24,47,0.95));
       border: 1px solid rgba(255,255,255,0.05);
       border-radius: 18px;
       padding: 22px;
@@ -284,20 +288,20 @@
     .server-name {
       font-size: 24px;
       font-weight: 800;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .server-desc {
       color: var(--muted);
-      font-size: 17px;
+      font-size: 16px;
       line-height: 1.5;
       margin-bottom: 16px;
     }
 
     .server-type-pill {
-      background: rgba(28, 210, 195, 0.16);
-      color: #49e4d8;
-      border: 1px solid rgba(73,228,216,0.16);
+      background: rgba(69,216,208,0.12);
+      border: 1px solid rgba(69,216,208,0.12);
+      color: #45d8d0;
       padding: 10px 14px;
       border-radius: 14px;
       font-weight: 800;
@@ -313,11 +317,11 @@
 
     .meta-pill {
       background: rgba(255,255,255,0.05);
-      color: #d4ddf8;
+      color: #d8e0fb;
       padding: 10px 14px;
       border-radius: 12px;
-      font-weight: 700;
       font-size: 14px;
+      font-weight: 700;
     }
 
     .tag-pill-wrap {
@@ -329,11 +333,11 @@
 
     .small-tag {
       background: rgba(255,255,255,0.05);
-      color: #dce5ff;
-      padding: 10px 14px;
+      color: #dce4ff;
+      padding: 9px 12px;
       border-radius: 12px;
-      font-weight: 700;
       font-size: 14px;
+      font-weight: 700;
     }
 
     .card-bottom {
@@ -344,7 +348,7 @@
     }
 
     .copy-btn {
-      background: rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.05);
       color: white;
       padding: 12px 16px;
@@ -354,16 +358,16 @@
     }
 
     .invite-text {
-      color: #dce5ff;
+      color: #dce4ff;
       font-size: 16px;
     }
 
     .footer {
-      background: linear-gradient(180deg, rgba(8,21,44,0.96), rgba(7,18,37,0.96));
-      border: 1px solid rgba(255,255,255,0.05);
+      background: linear-gradient(180deg, rgba(9,23,46,0.96), rgba(8,19,38,0.96));
+      border: 1px solid var(--border);
       border-radius: 18px;
       padding: 22px;
-      color: #b8c3df;
+      color: #b9c4de;
       line-height: 1.7;
       font-size: 15px;
     }
@@ -371,14 +375,8 @@
     .spacer-16 { height: 16px; }
 
     @media (max-width: 1100px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
+      .layout,
+      .stats-grid,
       .filters {
         grid-template-columns: 1fr;
       }
@@ -388,31 +386,16 @@
       }
 
       .search-actions {
-        width: 100%;
         flex-direction: row;
       }
     }
 
     @media (max-width: 700px) {
-      body {
-        padding: 14px;
-      }
-
-      .brand {
-        font-size: 22px;
-      }
-
-      .stat-value {
-        font-size: 42px;
-      }
-
-      .server-card-top {
-        flex-direction: column;
-      }
-
-      .search-actions {
-        flex-direction: column;
-      }
+      body { padding: 14px; }
+      .brand { font-size: 22px; }
+      .stat-value { font-size: 42px; }
+      .server-card-top { flex-direction: column; }
+      .search-actions { flex-direction: column; }
     }
   </style>
 </head>
@@ -427,29 +410,31 @@
       <button class="about-btn">ⓘ About</button>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div>
-          <div class="stat-label">Total Servers</div>
-          <div class="stat-value" id="totalServers">0</div>
+    <div class="stats-wrap">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">Total Servers</div>
+            <div class="stat-value" id="totalServers">0</div>
+          </div>
+          <div class="stat-icon">▤</div>
         </div>
-        <div class="stat-icon">▤</div>
-      </div>
 
-      <div class="stat-card">
-        <div>
-          <div class="stat-label">Filtered Results</div>
-          <div class="stat-value" id="filteredServers">0</div>
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">Filtered Results</div>
+            <div class="stat-value" id="filteredServers">0</div>
+          </div>
+          <div class="stat-icon" style="color:#d56cff;background:rgba(197,76,255,0.12);border-color:rgba(197,76,255,0.14);">⏷</div>
         </div>
-        <div class="stat-icon" style="color:#d56cff;background:rgba(176,77,255,0.12);border-color:rgba(176,77,255,0.16);">⏷</div>
-      </div>
 
-      <div class="stat-card">
-        <div>
-          <div class="stat-label">Selected Tags</div>
-          <div class="stat-value" id="selectedTagCount">0</div>
+        <div class="stat-card">
+          <div>
+            <div class="stat-label">Selected Tags</div>
+            <div class="stat-value" id="selectedTagCount">0</div>
+          </div>
+          <div class="stat-icon" style="color:#b98bff;background:rgba(125,77,255,0.12);border-color:rgba(125,77,255,0.14);">🏷</div>
         </div>
-        <div class="stat-icon" style="color:#b98bff;background:rgba(125,77,255,0.12);border-color:rgba(125,77,255,0.16);">🏷</div>
       </div>
     </div>
 
@@ -553,7 +538,7 @@
             <div id="postTags" class="tag-row"></div>
           </div>
 
-          <button class="btn btn-post" type="submit" style="margin-top:10px;">Post Server</button>
+          <button class="btn btn-post" type="submit">Post Server</button>
         </form>
       </div>
     </div>
@@ -574,6 +559,7 @@
       "New Player Friendly",
       "Roleplay",
       "Modded",
+      "Vanilla",
       "Chill / Casual",
       "Hardcore",
       "PvE",
@@ -607,8 +593,7 @@
 
     function formatDate(dateStr) {
       if (!dateStr) return "Unknown date";
-      const d = new Date(dateStr);
-      return d.toLocaleDateString();
+      return new Date(dateStr).toLocaleDateString();
     }
 
     function normalizeTags(tags) {
@@ -616,38 +601,23 @@
       return tags.map(t => String(t).trim()).filter(Boolean);
     }
 
+    function renderTagGroup(targetId, selectedArray, clickHandlerName) {
+      const box = document.getElementById(targetId);
+      if (!box) return;
+
+      box.innerHTML = TAGS.map(tag => {
+        const active = selectedArray.includes(tag) ? "active" : "";
+        return `<button type="button" class="tag-chip ${active}" onclick="${clickHandlerName}(${JSON.stringify(tag)})">${escapeHtml(tag)}</button>`;
+      }).join("");
+    }
+
     function renderSearchTags() {
-      const box = document.getElementById("quickTags");
-      box.innerHTML = TAGS.map(tag => `
-        <div class="tag-chip ${selectedSearchTags.includes(tag) ? "active" : ""}" data-tag="${escapeHtml(tag)}">
-          ${escapeHtml(tag)}
-        </div>
-      `).join("");
-
-      box.querySelectorAll(".tag-chip").forEach(chip => {
-        chip.addEventListener("click", () => {
-          const tag = chip.dataset.tag;
-          toggleSearchTag(tag);
-        });
-      });
-
+      renderTagGroup("quickTags", selectedSearchTags, "toggleSearchTag");
       document.getElementById("selectedTagCount").textContent = selectedSearchTags.length;
     }
 
     function renderPostTags() {
-      const box = document.getElementById("postTags");
-      box.innerHTML = TAGS.map(tag => `
-        <div class="tag-chip ${selectedPostTags.includes(tag) ? "active" : ""}" data-tag="${escapeHtml(tag)}">
-          ${escapeHtml(tag)}
-        </div>
-      `).join("");
-
-      box.querySelectorAll(".tag-chip").forEach(chip => {
-        chip.addEventListener("click", () => {
-          const tag = chip.dataset.tag;
-          togglePostTag(tag);
-        });
-      });
+      renderTagGroup("postTags", selectedPostTags, "togglePostTag");
     }
 
     function toggleSearchTag(tag) {
@@ -680,7 +650,12 @@
         .order("created_at", { ascending: false });
 
       if (error) {
-        document.getElementById("serverList").innerHTML = `<div class="server-card">Error loading servers.</div>`;
+        document.getElementById("serverList").innerHTML = `
+          <div class="server-card">
+            <div class="server-name">Error loading servers</div>
+            <div class="server-desc">${escapeHtml(error.message)}</div>
+          </div>
+        `;
         return;
       }
 
@@ -717,7 +692,6 @@
 
         const matchesType = !typeFilter || type === typeFilter;
         const matchesPlayers = !playersFilter || maxPlayers >= Number(playersFilter);
-
         const matchesTags =
           selectedSearchTags.length === 0 ||
           selectedSearchTags.every(tag => tags.includes(tag));
@@ -759,8 +733,9 @@
       box.innerHTML = servers.map(server => {
         const tags = normalizeTags(server.tags);
         const type = server.server_type || "unknown";
-        const playerLabel = server.max_players ? `${server.max_players} Players` : "No Player Limit Set";
-        const desc = server.description?.trim() ? server.description : "No description provided.";
+        const desc = server.description && server.description.trim()
+          ? server.description
+          : "No description provided.";
 
         return `
           <div class="server-card">
@@ -774,7 +749,7 @@
             <div class="server-desc">${escapeHtml(desc)}</div>
 
             <div class="meta-row">
-              <div class="meta-pill">${escapeHtml(playerLabel)}</div>
+              <div class="meta-pill">${escapeHtml(server.max_players ? server.max_players + " Players" : "No Player Limit Set")}</div>
               <div class="meta-pill">Posted ${escapeHtml(formatDate(server.created_at))}</div>
             </div>
 
@@ -786,7 +761,7 @@
             </div>
 
             <div class="card-bottom">
-              <button class="copy-btn" onclick="copyInvite('${escapeHtml(server.invite_code || "")}')">Copy Invite Code</button>
+              <button class="copy-btn" onclick="copyInvite(${JSON.stringify(server.invite_code || "")})">Copy Invite Code</button>
               <div class="invite-text">Invite Code: <span class="meta-pill">${escapeHtml(server.invite_code || "")}</span></div>
             </div>
           </div>
@@ -846,6 +821,10 @@
       renderSearchTags();
       applyFilters();
     });
+
+    window.toggleSearchTag = toggleSearchTag;
+    window.togglePostTag = togglePostTag;
+    window.copyInvite = copyInvite;
 
     renderSearchTags();
     renderPostTags();
