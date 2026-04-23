@@ -4,280 +4,567 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Windrose Server Finder</title>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #050d1d;
+      --panel: #09162d;
+      --panel-2: #0b1b36;
+      --border: rgba(110, 146, 255, 0.14);
+      --soft-border: rgba(255,255,255,0.05);
+      --text: #f3f6ff;
+      --muted: #9aa8c7;
+      --chip: #132544;
+      --chip-active: linear-gradient(135deg, #5f78ff, #b04dff);
+      --blue: #5f78ff;
+      --purple: #b04dff;
+      --green: #23d17f;
+      --yellow: #f3c746;
+      --red: #ff5d5d;
+      --shadow: 0 10px 30px rgba(0,0,0,0.28);
+    }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(180deg, #0b1020, #111933);
-      color: white;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(85,112,255,0.12), transparent 24%),
+        radial-gradient(circle at top right, rgba(176,77,255,0.10), transparent 22%),
+        linear-gradient(180deg, #040b18 0%, #071327 100%);
+      color: var(--text);
+      padding: 24px;
     }
 
-    .wrap {
-      max-width: 1200px;
-      margin: auto;
-      padding: 20px;
+    .container {
+      max-width: 1450px;
+      margin: 0 auto;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 24px;
-      font-size: 36px;
-    }
-
-    .panel {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 20px;
-      backdrop-filter: blur(8px);
-    }
-
-    .panel h2 {
-      margin-top: 0;
-      margin-bottom: 14px;
-      font-size: 22px;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .col-12 { grid-column: span 12; }
-    .col-6 { grid-column: span 6; }
-    .col-4 { grid-column: span 4; }
-    .col-3 { grid-column: span 3; }
-
-    @media (max-width: 800px) {
-      .col-6, .col-4, .col-3 { grid-column: span 12; }
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid #2d3f70;
-      background: #111a33;
-      color: white;
-      outline: none;
-      font-size: 15px;
-    }
-
-    input::placeholder {
-      color: #aab4d6;
-    }
-
-    .btn-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .primary-btn {
-      background: #6d7cff;
-      color: white;
-    }
-
-    .primary-btn:hover {
-      background: #8490ff;
-    }
-
-    .secondary-btn {
-      background: #23345f;
-      color: white;
-    }
-
-    .secondary-btn:hover {
-      background: #30467e;
-    }
-
-    .danger-btn {
-      background: #c93d3d;
-      color: white;
-    }
-
-    .danger-btn:hover {
-      background: #de4b4b;
-    }
-
-    .tag-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .tag-chip {
-      padding: 10px 14px;
-      background: #1b2a4d;
-      border: 1px solid #30467e;
-      border-radius: 999px;
-      cursor: pointer;
-      user-select: none;
-      transition: 0.2s ease;
-      font-size: 14px;
-    }
-
-    .tag-chip:hover {
-      background: #243865;
-    }
-
-    .tag-chip.active {
-      background: #6d7cff;
-      border-color: #6d7cff;
-    }
-
-    .muted {
-      color: #b9c4e6;
-      font-size: 14px;
-    }
-
-    .server-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-    }
-
-    .server {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
-      padding: 16px;
-    }
-
-    .server h3 {
-      margin: 0 0 10px 0;
-      font-size: 20px;
-    }
-
-    .server-info {
-      margin-bottom: 10px;
-      line-height: 1.6;
-      color: #d6def8;
-    }
-
-    .server-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 12px 0;
-    }
-
-    .server-tag {
-      background: #1a2748;
-      color: #dce5ff;
-      border: 1px solid #2e4278;
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-    }
-
-    .server-footer {
+    .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(95,120,255,0.25), rgba(176,77,255,0.25));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      font-size: 20px;
+    }
+
+    .about-btn {
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border: 1px solid var(--soft-border);
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 12px;
+      background: rgba(7,16,34,0.72);
+      border: 1px solid var(--soft-border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card {
+      background: linear-gradient(180deg, rgba(12,28,57,0.96), rgba(8,20,42,0.96));
+      border: 1px solid var(--soft-border);
+      border-radius: 18px;
+      padding: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 120px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 56px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      background: rgba(95,120,255,0.12);
+      border: 1px solid rgba(95,120,255,0.16);
+      color: #7fa0ff;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(8,21,44,0.96), rgba(7,18,37,0.96));
+      border: 1px solid var(--soft-border);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .search-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .search-actions {
+      display: flex;
+      flex-direction: column;
       gap: 10px;
-      margin-top: 14px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      background: #0f1d37;
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.05);
+      outline: none;
+      border-radius: 14px;
+      padding: 16px 16px;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 128px;
+      resize: vertical;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #8291b3;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+      color: #dce5ff;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 15px 18px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+    }
+
+    .btn-refresh {
+      background: #213253;
+    }
+
+    .btn-search,
+    .btn-post {
+      background: linear-gradient(90deg, #5f78ff, #cc4bcf);
+    }
+
+    .btn-clear {
+      background: #27225f;
+    }
+
+    .section-label {
+      font-size: 15px;
+      font-weight: 800;
+      color: #dce5ff;
+      margin: 18px 0 12px;
+    }
+
+    .tag-row {
+      display: flex;
       flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
-    .empty {
-      text-align: center;
-      padding: 30px 10px;
-      color: #b9c4e6;
+    .tag-chip {
+      border: 1px solid rgba(255,255,255,0.05);
+      background: #132544;
+      color: #f3f6ff;
+      padding: 12px 16px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+      transition: 0.18s ease;
+      user-select: none;
     }
 
-    .divider {
-      height: 1px;
-      background: rgba(255,255,255,0.08);
-      margin: 22px 0;
+    .tag-chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .tag-chip.active {
+      background: linear-gradient(135deg, rgba(95,120,255,0.92), rgba(176,77,255,0.92));
+      border-color: transparent;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .server-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .server-card {
+      background: linear-gradient(180deg, rgba(15,29,55,0.95), rgba(11,24,47,0.95));
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 18px;
+      padding: 22px;
+    }
+
+    .server-card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .server-name {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .server-desc {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .server-type-pill {
+      background: rgba(28, 210, 195, 0.16);
+      color: #49e4d8;
+      border: 1px solid rgba(73,228,216,0.16);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .meta-pill {
+      background: rgba(255,255,255,0.05);
+      color: #d4ddf8;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .tag-pill-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .small-tag {
+      background: rgba(255,255,255,0.05);
+      color: #dce5ff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .card-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .copy-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.05);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .invite-text {
+      color: #dce5ff;
+      font-size: 16px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .footer {
+      background: linear-gradient(180deg, rgba(8,21,44,0.96), rgba(7,18,37,0.96));
+      border: 1px solid var(--soft-border);
+      border-radius: 18px;
+      padding: 22px;
+      color: #b8c3df;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .spacer-16 { height: 16px; }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .search-top {
+        grid-template-columns: 1fr;
+      }
+
+      .search-actions {
+        flex-direction: row;
+      }
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 14px;
+      }
+
+      .brand {
+        font-size: 22px;
+      }
+
+      .stat-value {
+        font-size: 42px;
+      }
+
+      .server-card-top {
+        flex-direction: column;
+      }
+
+      .search-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Windrose Server Finder</h1>
+  <div class="container">
 
-    <!-- SEARCH -->
-    <div class="panel">
-      <h2>Search Servers</h2>
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+        <div>Windrose Server Finder</div>
+      </div>
+      <button class="about-btn">ⓘ About</button>
+    </div>
 
-      <div class="row">
-        <div class="col-12">
-          <input id="searchInput" type="text" placeholder="Search by server name, invite code, or tags..." />
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Total Servers</div>
+          <div class="stat-value" id="totalServers">0</div>
         </div>
+        <div class="stat-icon">▤</div>
       </div>
 
-      <div class="row">
-        <div class="col-12">
-          <div id="searchTags" class="tag-list"></div>
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Filtered Results</div>
+          <div class="stat-value" id="filteredServers">0</div>
         </div>
+        <div class="stat-icon" style="color:#d56cff;background:rgba(176,77,255,0.12);border-color:rgba(176,77,255,0.16);">⏷</div>
       </div>
 
-      <div class="btn-row">
-        <button class="primary-btn" id="searchBtn" type="button">Search</button>
-        <button class="secondary-btn" id="clearSearchBtn" type="button">Clear Filters</button>
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Selected Tags</div>
+          <div class="stat-value" id="selectedTagCount">0</div>
+        </div>
+        <div class="stat-icon" style="color:#b98bff;background:rgba(125,77,255,0.12);border-color:rgba(125,77,255,0.16);">🏷</div>
       </div>
     </div>
 
-    <!-- POST -->
-    <div class="panel">
-      <h2>Post Your Server</h2>
+    <div class="layout">
+      <!-- LEFT -->
+      <div class="panel">
+        <div class="panel-title">Find a Server</div>
 
-      <form id="form">
-        <div class="row">
-          <div class="col-6">
-            <input name="poster_name" placeholder="Your Name" required />
-          </div>
-          <div class="col-6">
-            <input name="name" placeholder="Server Name" required />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-6">
-            <input name="invite_code" placeholder="Invite Code / Join Info" required />
-          </div>
-          <div class="col-6">
-            <input name="max_players" type="number" min="1" placeholder="Max Players" required />
+        <div class="search-top">
+          <input id="searchInput" type="text" placeholder="Search by name, description, tag, or invite code" />
+          <div class="search-actions">
+            <button class="btn btn-refresh" id="refreshBtn" type="button">Refresh</button>
+            <button class="btn btn-search" id="searchBtn" type="button">Search</button>
+            <button class="btn btn-clear" id="clearBtn" type="button">Clear Filters</button>
           </div>
         </div>
 
-        <div class="row">
-          <div class="col-12">
-            <div id="postTags" class="tag-list"></div>
+        <div class="section-label">Quick Tags</div>
+        <div id="quickTags" class="tag-row"></div>
+
+        <div class="filters">
+          <div>
+            <label for="sortSelect">Sort:</label>
+            <select id="sortSelect">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="name_asc">Name A-Z</option>
+              <option value="name_desc">Name Z-A</option>
+              <option value="players_high">Max Players High-Low</option>
+              <option value="players_low">Max Players Low-High</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="typeFilter">Server Type:</label>
+            <select id="typeFilter">
+              <option value="">All Servers</option>
+              <option value="modded">Modded</option>
+              <option value="vanilla">Vanilla</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="playersFilter">Max Players:</label>
+            <select id="playersFilter">
+              <option value="">Any Player Count</option>
+              <option value="25">25+</option>
+              <option value="50">50+</option>
+              <option value="75">75+</option>
+              <option value="100">100+</option>
+            </select>
           </div>
         </div>
 
-        <div class="muted">Choose up to 5 tags</div>
+        <div id="serverList" class="server-list"></div>
+      </div>
 
-        <div class="btn-row">
-          <button class="primary-btn" type="submit">Post Server</button>
-        </div>
-      </form>
+      <!-- RIGHT -->
+      <div class="panel">
+        <div class="panel-title">Post Your Server</div>
+
+        <form id="serverForm">
+          <div>
+            <label>Server Name</label>
+            <input name="name" placeholder="Enter server name" required />
+          </div>
+
+          <div class="spacer-16"></div>
+
+          <div>
+            <label>Description</label>
+            <textarea name="description" placeholder="Enter description (optional)"></textarea>
+          </div>
+
+          <div class="spacer-16"></div>
+
+          <div>
+            <label>Invite Code</label>
+            <input name="invite_code" placeholder="Enter invite code" required />
+          </div>
+
+          <div class="spacer-16"></div>
+
+          <div>
+            <label>Max Player Count</label>
+            <input name="max_players" type="number" min="1" placeholder="Enter max player count" required />
+          </div>
+
+          <div class="spacer-16"></div>
+
+          <div>
+            <label>Server Type</label>
+            <select name="server_type" required>
+              <option value="modded">Modded</option>
+              <option value="vanilla">Vanilla</option>
+            </select>
+          </div>
+
+          <div class="spacer-16"></div>
+
+          <div>
+            <label>Click Tags</label>
+            <div id="postTags" class="tag-row"></div>
+          </div>
+
+          <button class="btn btn-post" type="submit" style="width:100%; margin-top:10px;">Post Server</button>
+        </form>
+      </div>
     </div>
 
-    <!-- RESULTS -->
-    <div class="panel">
-      <h2>Server Listings</h2>
-      <div id="servers"></div>
+    <div class="footer">
+      Unofficial Community Project: This website is not affiliated with or endorsed by Windrose. The creator is not part of the official Windrose team.<br>
+      This project is made for the community and is not monetized or used to generate any income.<br>
+      All trademarks and game content belong to their respective owners.
     </div>
   </div>
 
@@ -290,47 +577,29 @@
       "new player friendly",
       "roleplay",
       "modded",
-      "vanilla",
-      "chill",
+      "chill / casual",
       "hardcore",
       "pve",
       "pvp",
       "survival",
       "events",
       "loot boosted",
-      "low loot",
       "low pop",
       "high pop",
-      "no wipe",
-      "weekly wipe",
-      "monthly wipe",
       "community",
+      "weekly wipe",
       "solo friendly",
-      "duo friendly",
-      "trio friendly",
-      "factions",
       "base building",
       "raiding",
-      "custom map",
-      "active admins",
-      "economy",
-      "beginner friendly",
-      "competitive",
-      "full send"
+      "active admins"
     ];
 
-    let selectedPostTags = [];
-    let selectedSearchTags = [];
     let allServers = [];
+    let selectedSearchTags = [];
+    let selectedPostTags = [];
 
-    let ownerToken = localStorage.getItem("windrose_owner_token");
-    if (!ownerToken) {
-      ownerToken = crypto.randomUUID();
-      localStorage.setItem("windrose_owner_token", ownerToken);
-    }
-
-    function safeHtml(text) {
-      if (text === null || text === undefined) return "";
+    function escapeHtml(text) {
+      if (!text) return "";
       return String(text)
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
@@ -339,22 +608,40 @@
         .replaceAll("'", "&#39;");
     }
 
-    function renderPostTagButtons() {
-      const el = document.getElementById("postTags");
-      el.innerHTML = TAGS.map(tag => `
+    function formatDate(dateStr) {
+      if (!dateStr) return "Unknown date";
+      const d = new Date(dateStr);
+      return d.toLocaleDateString();
+    }
+
+    function renderSearchTags() {
+      const box = document.getElementById("quickTags");
+      box.innerHTML = TAGS.map(tag => `
+        <div class="tag-chip ${selectedSearchTags.includes(tag) ? "active" : ""}" onclick="toggleSearchTag('${tag.replaceAll("'", "\\'")}')">
+          ${escapeHtml(tag)}
+        </div>
+      `).join("");
+
+      document.getElementById("selectedTagCount").textContent = selectedSearchTags.length;
+    }
+
+    function renderPostTags() {
+      const box = document.getElementById("postTags");
+      box.innerHTML = TAGS.map(tag => `
         <div class="tag-chip ${selectedPostTags.includes(tag) ? "active" : ""}" onclick="togglePostTag('${tag.replaceAll("'", "\\'")}')">
-          ${safeHtml(tag)}
+          ${escapeHtml(tag)}
         </div>
       `).join("");
     }
 
-    function renderSearchTagButtons() {
-      const el = document.getElementById("searchTags");
-      el.innerHTML = TAGS.map(tag => `
-        <div class="tag-chip ${selectedSearchTags.includes(tag) ? "active" : ""}" onclick="toggleSearchTag('${tag.replaceAll("'", "\\'")}')">
-          ${safeHtml(tag)}
-        </div>
-      `).join("");
+    function toggleSearchTag(tag) {
+      if (selectedSearchTags.includes(tag)) {
+        selectedSearchTags = selectedSearchTags.filter(t => t !== tag);
+      } else {
+        selectedSearchTags.push(tag);
+      }
+      renderSearchTags();
+      applyFilters();
     }
 
     function togglePostTag(tag) {
@@ -367,17 +654,7 @@
         }
         selectedPostTags.push(tag);
       }
-      renderPostTagButtons();
-    }
-
-    function toggleSearchTag(tag) {
-      if (selectedSearchTags.includes(tag)) {
-        selectedSearchTags = selectedSearchTags.filter(t => t !== tag);
-      } else {
-        selectedSearchTags.push(tag);
-      }
-      renderSearchTagButtons();
-      applyFilters();
+      renderPostTags();
     }
 
     async function loadServers() {
@@ -387,125 +664,142 @@
         .order("created_at", { ascending: false });
 
       if (error) {
-        document.getElementById("servers").innerHTML = `
-          <div class="empty">Error loading servers: ${safeHtml(error.message)}</div>
-        `;
+        document.getElementById("serverList").innerHTML = `<div class="server-card">Error loading servers.</div>`;
         return;
       }
 
       allServers = data || [];
+      document.getElementById("totalServers").textContent = allServers.length;
       applyFilters();
     }
 
     function applyFilters() {
-      const searchText = document.getElementById("searchInput").value.trim().toLowerCase();
+      const search = document.getElementById("searchInput").value.trim().toLowerCase();
+      const typeFilter = document.getElementById("typeFilter").value;
+      const playersFilter = document.getElementById("playersFilter").value;
+      const sortValue = document.getElementById("sortSelect").value;
 
-      const filtered = allServers.filter(server => {
+      let filtered = [...allServers].filter(server => {
         const name = (server.name || "").toLowerCase();
+        const desc = (server.description || "").toLowerCase();
         const invite = (server.invite_code || "").toLowerCase();
-        const poster = (server.poster_name || "").toLowerCase();
+        const type = (server.server_type || "").toLowerCase();
         const tags = Array.isArray(server.tags) ? server.tags : [];
-        const tagsText = tags.join(" ").toLowerCase();
+        const tagText = tags.join(" ").toLowerCase();
+        const maxPlayers = Number(server.max_players || 0);
 
-        const textMatch =
-          !searchText ||
-          name.includes(searchText) ||
-          invite.includes(searchText) ||
-          poster.includes(searchText) ||
-          tagsText.includes(searchText);
+        const matchesSearch =
+          !search ||
+          name.includes(search) ||
+          desc.includes(search) ||
+          invite.includes(search) ||
+          tagText.includes(search);
 
-        const tagMatch =
+        const matchesType =
+          !typeFilter ||
+          type === typeFilter;
+
+        const matchesPlayers =
+          !playersFilter ||
+          maxPlayers >= Number(playersFilter);
+
+        const matchesTags =
           selectedSearchTags.length === 0 ||
           selectedSearchTags.every(tag => tags.includes(tag));
 
-        return textMatch && tagMatch;
+        return matchesSearch && matchesType && matchesPlayers && matchesTags;
       });
 
+      if (sortValue === "newest") {
+        filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      } else if (sortValue === "oldest") {
+        filtered.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+      } else if (sortValue === "name_asc") {
+        filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      } else if (sortValue === "name_desc") {
+        filtered.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+      } else if (sortValue === "players_high") {
+        filtered.sort((a, b) => Number(b.max_players || 0) - Number(a.max_players || 0));
+      } else if (sortValue === "players_low") {
+        filtered.sort((a, b) => Number(a.max_players || 0) - Number(b.max_players || 0));
+      }
+
+      document.getElementById("filteredServers").textContent = filtered.length;
       renderServers(filtered);
     }
 
-    function renderServers(list) {
-      const el = document.getElementById("servers");
+    function renderServers(servers) {
+      const box = document.getElementById("serverList");
 
-      if (!list.length) {
-        el.innerHTML = `<div class="empty">No servers found.</div>`;
+      if (!servers.length) {
+        box.innerHTML = `
+          <div class="server-card">
+            <div class="server-name">No servers found</div>
+            <div class="server-desc">Try changing your search or filters.</div>
+          </div>
+        `;
         return;
       }
 
-      el.innerHTML = `
-        <div class="server-grid">
-          ${list.map(server => {
-            const tags = Array.isArray(server.tags) ? server.tags : [];
-            const canDelete = server.owner_token && server.owner_token === ownerToken;
+      box.innerHTML = servers.map(server => {
+        const tags = Array.isArray(server.tags) ? server.tags : [];
+        const type = server.server_type || "unknown";
+        const playerLabel = server.max_players ? `${server.max_players} Players` : "No Player Limit Set";
+        const desc = server.description?.trim() ? server.description : "No description provided.";
 
-            return `
-              <div class="server">
-                <h3>${safeHtml(server.name)}</h3>
-
-                <div class="server-info">
-                  <div><strong>Posted by:</strong> ${safeHtml(server.poster_name || "Unknown")}</div>
-                  <div><strong>Max Players:</strong> ${safeHtml(server.max_players || "")}</div>
-                  <div><strong>Join Info:</strong> ${safeHtml(server.invite_code || "")}</div>
-                </div>
-
-                <div class="server-tags">
-                  ${tags.length
-                    ? tags.map(tag => `<span class="server-tag">${safeHtml(tag)}</span>`).join("")
-                    : `<span class="server-tag">no tags</span>`
-                  }
-                </div>
-
-                <div class="server-footer">
-                  ${canDelete
-                    ? `<button class="danger-btn" onclick="deleteServer('${server.id}')">Delete</button>`
-                    : `<span class="muted">Only poster can delete</span>`
-                  }
-                </div>
+        return `
+          <div class="server-card">
+            <div class="server-card-top">
+              <div>
+                <div class="server-name">${escapeHtml(server.name || "Untitled Server")}</div>
               </div>
-            `;
-          }).join("")}
-        </div>
-      `;
+              <div class="server-type-pill">${escapeHtml(type.charAt(0).toUpperCase() + type.slice(1))}</div>
+            </div>
+
+            <div class="server-desc">${escapeHtml(desc)}</div>
+
+            <div class="meta-row">
+              <div class="meta-pill">${escapeHtml(playerLabel)}</div>
+              <div class="meta-pill">Posted ${escapeHtml(formatDate(server.created_at))}</div>
+            </div>
+
+            <div class="tag-pill-wrap">
+              ${tags.length
+                ? tags.map(tag => `<div class="small-tag">${escapeHtml(tag)}</div>`).join("")
+                : `<div class="small-tag">No Tags</div>`
+              }
+            </div>
+
+            <div class="card-bottom">
+              <button class="copy-btn" onclick="copyInvite('${escapeHtml(server.invite_code || "")}')">Copy Invite Code</button>
+              <div class="invite-text">Invite Code: <span class="meta-pill">${escapeHtml(server.invite_code || "")}</span></div>
+            </div>
+          </div>
+        `;
+      }).join("");
     }
 
-    async function deleteServer(id) {
-      const server = allServers.find(s => String(s.id) === String(id));
-      if (!server) return;
-
-      if (server.owner_token !== ownerToken) {
-        alert("You can only delete your own posts.");
-        return;
+    async function copyInvite(code) {
+      try {
+        await navigator.clipboard.writeText(code);
+        alert("Invite code copied");
+      } catch {
+        alert("Could not copy invite code");
       }
-
-      const ok = confirm("Delete this server post?");
-      if (!ok) return;
-
-      const { error } = await db
-        .from("servers")
-        .delete()
-        .eq("id", id)
-        .eq("owner_token", ownerToken);
-
-      if (error) {
-        alert("Delete failed: " + error.message);
-        return;
-      }
-
-      await loadServers();
     }
 
-    document.getElementById("form").onsubmit = async (e) => {
+    document.getElementById("serverForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const form = new FormData(e.target);
 
       const payload = {
-        poster_name: form.get("poster_name"),
         name: form.get("name"),
+        description: form.get("description"),
         invite_code: form.get("invite_code"),
         max_players: Number(form.get("max_players")),
-        tags: selectedPostTags,
-        owner_token: ownerToken
+        server_type: form.get("server_type"),
+        tags: selectedPostTags
       };
 
       const { error } = await db.from("servers").insert([payload]);
@@ -515,30 +809,36 @@
         return;
       }
 
-      selectedPostTags = [];
       e.target.reset();
-      renderPostTagButtons();
-      await loadServers();
-    };
+      selectedPostTags = [];
+      renderPostTags();
+      loadServers();
+    });
 
     document.getElementById("searchBtn").addEventListener("click", applyFilters);
+    document.getElementById("refreshBtn").addEventListener("click", loadServers);
+    document.getElementById("searchInput").addEventListener("input", applyFilters);
+    document.getElementById("sortSelect").addEventListener("change", applyFilters);
+    document.getElementById("typeFilter").addEventListener("change", applyFilters);
+    document.getElementById("playersFilter").addEventListener("change", applyFilters);
 
-    document.getElementById("clearSearchBtn").addEventListener("click", () => {
+    document.getElementById("clearBtn").addEventListener("click", () => {
       document.getElementById("searchInput").value = "";
+      document.getElementById("sortSelect").value = "newest";
+      document.getElementById("typeFilter").value = "";
+      document.getElementById("playersFilter").value = "";
       selectedSearchTags = [];
-      renderSearchTagButtons();
+      renderSearchTags();
       applyFilters();
     });
 
-    document.getElementById("searchInput").addEventListener("input", applyFilters);
-
-    renderPostTagButtons();
-    renderSearchTagButtons();
-    loadServers();
-
-    window.togglePostTag = togglePostTag;
     window.toggleSearchTag = toggleSearchTag;
-    window.deleteServer = deleteServer;
+    window.togglePostTag = togglePostTag;
+    window.copyInvite = copyInvite;
+
+    renderSearchTags();
+    renderPostTags();
+    loadServers();
   </script>
 </body>
 </html>
