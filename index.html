@@ -19,6 +19,7 @@
       --blue: #5e7cff;
       --purple: #c54cff;
       --cyan: #45d8d0;
+      --red: #d94b5c;
       --shadow: 0 10px 28px rgba(0,0,0,0.28);
     }
 
@@ -212,6 +213,11 @@
     .btn-clear {
       background: #3b2f77;
       min-width: 140px;
+    }
+
+    .btn-delete {
+      background: var(--red);
+      min-width: 110px;
     }
 
     .filters {
@@ -485,6 +491,12 @@
 
     let allServers = [];
 
+    let ownerToken = localStorage.getItem("windrose_owner_token");
+    if (!ownerToken) {
+      ownerToken = crypto.randomUUID();
+      localStorage.setItem("windrose_owner_token", ownerToken);
+    }
+
     function escapeHtml(text) {
       if (text === null || text === undefined) return "";
       return String(text)
@@ -593,6 +605,8 @@
           ? server.description
           : "No description provided.";
 
+        const canDelete = server.owner_token && server.owner_token === ownerToken;
+
         return `
           <div class="server-card">
             <div class="server-card-top">
@@ -612,6 +626,7 @@
             <div class="card-bottom">
               <button class="copy-btn" onclick="copyInvite(${JSON.stringify(server.invite_code || "")})">Copy Invite Code</button>
               <div class="invite-text">Invite Code: <span class="meta-pill">${escapeHtml(server.invite_code || "")}</span></div>
+              ${canDelete ? `<button class="btn btn-delete" type="button" onclick="deleteServer('${server.id}')">Delete</button>` : ""}
             </div>
           </div>
         `;
@@ -627,6 +642,24 @@
       }
     }
 
+    async function deleteServer(id) {
+      const ok = confirm("Delete this server post?");
+      if (!ok) return;
+
+      const { error } = await db
+        .from("servers")
+        .delete()
+        .eq("id", id)
+        .eq("owner_token", ownerToken);
+
+      if (error) {
+        alert("Delete failed: " + error.message);
+        return;
+      }
+
+      loadServers();
+    }
+
     document.getElementById("serverForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -637,7 +670,8 @@
         description: form.get("description"),
         invite_code: form.get("invite_code"),
         max_players: Number(form.get("max_players")),
-        server_type: form.get("server_type")
+        server_type: form.get("server_type"),
+        owner_token: ownerToken
       };
 
       const { error } = await db.from("servers").insert([payload]);
@@ -667,6 +701,7 @@
     });
 
     window.copyInvite = copyInvite;
+    window.deleteServer = deleteServer;
 
     loadServers();
   </script>
