@@ -614,9 +614,10 @@
             </div>
 
             <div class="field">
-              <label for="tags">Tags (comma separated)</label>
-              <input id="tags" name="tags" type="text" placeholder="e.g. new player friendly, roleplay, chill" />
-              <div class="helper">Try tags like new player friendly, roleplay, modded, chill, hardcore. The pvp tag is blocked.</div>
+              <label>Choose Tags</label>
+              <div id="postTagButtons" class="tag-list"></div>
+              <input id="tags" name="tags" type="hidden" />
+              <div class="helper">Tap up to 5 tags for your server post.</div>
             </div>
 
             <button class="primary-btn" type="submit">Post Server</button>
@@ -645,13 +646,24 @@
     let activeTags = new Set();
     let currentSearch = "";
     let favoritesOnly = false;
+    let selectedPostTags = [];
 
     const PRESET_TAGS = [
       { label: "New Player Friendly", icon: "🌿", value: "new player friendly" },
       { label: "Roleplay", icon: "🎭", value: "roleplay" },
       { label: "Modded", icon: "🔧", value: "modded" },
       { label: "Chill / Casual", icon: "🙂", value: "chill / casual" },
-      { label: "Hardcore", icon: "🔥", value: "hardcore" }
+      { label: "Hardcore", icon: "🔥", value: "hardcore" },
+      { label: "PvE", icon: "🛡️", value: "pve" },
+      { label: "Survival", icon: "🏕️", value: "survival" },
+      { label: "Events", icon: "🎉", value: "events" },
+      { label: "Trading", icon: "💰", value: "trading" },
+      { label: "Questing", icon: "📜", value: "questing" },
+      { label: "Noob Friendly", icon: "🤝", value: "noob friendly" },
+      { label: "Competitive", icon: "⚔️", value: "competitive" },
+      { label: "Community", icon: "👥", value: "community" },
+      { label: "Weekend Raids", icon: "🗓️", value: "weekend raids" },
+      { label: "Loot Boosted", icon: "📦", value: "loot boosted" }
     ];
 
     const BANNED_TAGS = ["pvp"];
@@ -672,6 +684,7 @@
     const selectedTagsCountEl = document.getElementById("selectedTagsCount");
     const serverFormEl = document.getElementById("serverForm");
     const formStatusEl = document.getElementById("formStatus");
+    const postTagButtonsEl = document.getElementById("postTagButtons");
 
     function getFavorites() {
       try {
@@ -771,15 +784,59 @@
     }
 
     function getAllTags(servers) {
-      const tagSet = new Set(PRESET_TAGS.map(tag => tag.value));
-      servers.forEach(server => {
-        normalizeTags(server.tags).forEach(tag => tagSet.add(tag));
+      const counts = {};
+
+      PRESET_TAGS.forEach(tag => {
+        if (!BANNED_TAGS.includes(tag.value)) {
+          counts[tag.value] = 0;
+        }
       });
-      return [...tagSet].filter(tag => !BANNED_TAGS.includes(tag)).sort((a, b) => a.localeCompare(b));
+
+      servers.forEach(server => {
+        normalizeTags(server.tags).forEach(tag => {
+          if (!BANNED_TAGS.includes(tag)) {
+            counts[tag] = (counts[tag] || 0) + 1;
+          }
+        });
+      });
+
+      return Object.keys(counts).sort((a, b) => {
+        const countDiff = (counts[b] || 0) - (counts[a] || 0);
+        if (countDiff !== 0) return countDiff;
+        return a.localeCompare(b);
+      });
     }
 
     function getTagMeta(tag) {
       return PRESET_TAGS.find(item => item.value === tag) || null;
+    }
+
+    function renderPostTagButtons() {
+      postTagButtonsEl.innerHTML = PRESET_TAGS.filter(tag => !BANNED_TAGS.includes(tag.value)).map(tag => `
+        <button class="tag-chip ${selectedPostTags.includes(tag.value) ? 'active' : ''}" type="button" data-post-tag="${escapeHtml(tag.value)}">
+          <span>${tag.icon}</span><span>${escapeHtml(tag.label)}</span>
+        </button>
+      `).join('');
+
+      postTagButtonsEl.querySelectorAll('[data-post-tag]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tag = btn.dataset.postTag;
+
+          if (selectedPostTags.includes(tag)) {
+            selectedPostTags = selectedPostTags.filter(item => item !== tag);
+          } else {
+            if (selectedPostTags.length >= 5) {
+              showStatus('You can only choose up to 5 tags.', 'error');
+              return;
+            }
+            selectedPostTags.push(tag);
+          }
+
+          document.getElementById('tags').value = selectedPostTags.join(', ');
+          renderPostTagButtons();
+        });
+      });
+    });
     }
 
     function serverMatchesPlayersFilter(server, filterValue) {
@@ -834,10 +891,11 @@
       tagFiltersEl.innerHTML = tags.map(tag => {
         const meta = getTagMeta(tag);
         const label = meta ? meta.label : titleCase(tag);
+        const count = allServers.reduce((total, server) => total + (normalizeTags(server.tags).includes(tag) ? 1 : 0), 0);
         const icon = meta ? meta.icon + ' ' : '';
         return `
           <button class="tag-chip ${activeTags.has(tag) ? 'active' : ''}" type="button" data-tag="${escapeHtml(tag)}">
-            <span>${icon}</span><span>${escapeHtml(label)}</span>
+            <span>${icon}</span><span>${escapeHtml(label)}</span><span style="opacity:.7;font-size:12px;">${count}</span>
           </button>
         `;
       }).join("");
@@ -975,7 +1033,7 @@
         invite_code: String(formData.get('invite_code') || '').trim(),
         max_players: Number(formData.get('max_players')),
         modded: String(formData.get('modded')) === 'true',
-        tags: normalizeTags(formData.get('tags')),
+        tags: normalizeTags(selectedPostTags),
         owner_token_hash: ownerTokenHash
       };
 
@@ -1008,8 +1066,12 @@
       }
 
       serverFormEl.reset();
+      selectedPostTags = [];
+      document.getElementById('tags').value = '';
+      renderPostTagButtons();
       showStatus('Server posted successfully.', 'success');
-      await loadServers();
+      await renderPostTagButtons();
+    loadServers();
     }
 
     async function deleteServer(id) {
