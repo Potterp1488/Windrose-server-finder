@@ -1,709 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Windrose Server Finder</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windrose Server Finder</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+* { box-sizing: border-box; }
 
-    :root {
-      --bg: #061120;
-      --panel: #0a1730;
-      --panel2: #0d1d3a;
-      --border: rgba(255,255,255,0.06);
-      --text: #f4f7ff;
-      --muted: #a8b3d1;
-      --blue: #5e7cff;
-      --purple: #c54cff;
-      --cyan: #45d8d0;
-      --red: #d94b5c;
-      --shadow: 0 10px 28px rgba(0,0,0,0.28);
-    }
+body {
+  margin:0;
+  font-family:Arial;
+  color:#fff;
+  background:linear-gradient(#040b18,#091427);
+  padding:20px;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(94,124,255,0.10), transparent 25%),
-        radial-gradient(circle at top right, rgba(197,76,255,0.10), transparent 22%),
-        linear-gradient(180deg, #040b18 0%, #091427 100%);
-      padding: 22px;
-    }
+.container { max-width:1200px; margin:auto; }
 
-    .container {
-      max-width: 1450px;
-      margin: 0 auto;
-    }
+.panel {
+  background:#0d1d3a;
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:20px;
+}
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
+.search-actions {
+  display:flex;
+  gap:10px;
+  margin:10px 0;
+}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 28px;
-      font-weight: 800;
-    }
+input, select {
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  background:#10203c;
+  color:white;
+}
 
-    .brand-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, rgba(94,124,255,0.22), rgba(197,76,255,0.22));
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      font-size: 20px;
-    }
+.btn {
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-    .about-btn {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.03);
-      color: white;
-      border-radius: 14px;
-      padding: 12px 18px;
-      font-weight: 700;
-      cursor: pointer;
-    }
+.btn-search { background:#5e7cff; }
+.btn-refresh { background:#263b63; }
+.btn-clear { background:#3b2f77; }
+.btn-delete { background:#d94b5c; }
 
-    .stats-wrap {
-      background: rgba(8,16,34,0.72);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 12px;
-      margin-bottom: 18px;
-      box-shadow: var(--shadow);
-    }
+.filters {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
+.server {
+  background:#14284a;
+  padding:15px;
+  border-radius:12px;
+  margin-top:10px;
+}
 
-    .stat-card {
-      background: linear-gradient(180deg, rgba(11,27,53,0.96), rgba(8,19,38,0.96));
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      min-height: 115px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+.meta {
+  font-size:13px;
+  opacity:.7;
+  margin-top:5px;
+}
 
-    .stat-label {
-      color: var(--muted);
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .stat-value {
-      font-size: 54px;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .stat-icon {
-      width: 62px;
-      height: 62px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      font-size: 26px;
-      background: rgba(94,124,255,0.12);
-      border: 1px solid rgba(94,124,255,0.14);
-      color: #84a0ff;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .panel {
-      background: linear-gradient(180deg, rgba(9,23,46,0.96), rgba(8,19,38,0.96));
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 22px;
-      box-shadow: var(--shadow);
-    }
-
-    .panel-title {
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 18px;
-    }
-
-    .search-top {
-      margin-bottom: 14px;
-    }
-
-    .search-actions {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      background: #10203c;
-      color: white;
-      border: 1px solid rgba(255,255,255,0.05);
-      outline: none;
-      border-radius: 14px;
-      padding: 15px 16px;
-      font-size: 16px;
-    }
-
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color: #8d9abc;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #dce4ff;
-      font-weight: 700;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 14px;
-      padding: 13px 18px;
-      font-size: 15px;
-      font-weight: 800;
-      color: white;
-      cursor: pointer;
-      min-height: 48px;
-    }
-
-    .btn-refresh {
-      background: #263b63;
-      min-width: 120px;
-    }
-
-    .btn-search,
-    .btn-post {
-      background: linear-gradient(90deg, #5e7cff, #d44dcb);
-      min-width: 120px;
-    }
-
-    .btn-clear {
-      background: #3b2f77;
-      min-width: 140px;
-    }
-
-    .btn-delete {
-      background: var(--red);
-      min-width: 110px;
-    }
-
-    .filters {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .server-list {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-height: 280px;
-    }
-
-    .server-card {
-      background: linear-gradient(180deg, rgba(15,30,57,0.95), rgba(11,24,47,0.95));
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 18px;
-      padding: 22px;
-    }
-
-    .server-card-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: flex-start;
-      margin-bottom: 10px;
-    }
-
-    .server-name {
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-
-    .server-desc {
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.5;
-      margin-bottom: 16px;
-    }
-
-    .server-type-pill {
-      background: rgba(69,216,208,0.12);
-      border: 1px solid rgba(69,216,208,0.12);
-      color: #45d8d0;
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .meta-pill {
-      background: rgba(255,255,255,0.05);
-      color: #d8e0fb;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .card-bottom {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .copy-btn {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.05);
-      color: white;
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .invite-text {
-      color: #dce4ff;
-      font-size: 16px;
-    }
-
-    .footer {
-      background: linear-gradient(180deg, rgba(9,23,46,0.96), rgba(8,19,38,0.96));
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      color: #b9c4de;
-      line-height: 1.7;
-      font-size: 15px;
-    }
-
-    .spacer-16 { height: 16px; }
-
-    @media (max-width: 1100px) {
-      .layout,
-      .stats-grid,
-      .filters {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 700px) {
-      body { padding: 14px; }
-      .brand { font-size: 22px; }
-      .stat-value { font-size: 42px; }
-      .server-card-top { flex-direction: column; }
-      .search-actions { flex-direction: column; }
-      .btn { width: 100%; }
-    }
-  </style>
+.actions {
+  margin-top:10px;
+  display:flex;
+  gap:10px;
+}
+</style>
 </head>
+
 <body>
-  <div class="container">
+<div class="container">
 
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand-icon">✦</div>
-        <div>Windrose Server Finder</div>
-      </div>
-      <button class="about-btn" type="button">ⓘ About</button>
-    </div>
+<div class="panel">
+<h2>Find a Server</h2>
 
-    <div class="stats-wrap">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div>
-            <div class="stat-label">Total Servers</div>
-            <div class="stat-value" id="totalServers">0</div>
-          </div>
-          <div class="stat-icon">▤</div>
-        </div>
+<input id="searchInput" placeholder="Search..." />
 
-        <div class="stat-card">
-          <div>
-            <div class="stat-label">Filtered Results</div>
-            <div class="stat-value" id="filteredServers">0</div>
-          </div>
-          <div class="stat-icon" style="color:#d56cff;background:rgba(197,76,255,0.12);border-color:rgba(197,76,255,0.14);">⏷</div>
-        </div>
+<div class="search-actions">
+<button class="btn btn-refresh" id="refreshBtn">Refresh</button>
+<button class="btn btn-search" id="searchBtn">Search</button>
+<button class="btn btn-clear" id="clearBtn">Clear</button>
+</div>
 
-        <div class="stat-card">
-          <div>
-            <div class="stat-label">Active Filters</div>
-            <div class="stat-value" id="activeFilterCount">0</div>
-          </div>
-          <div class="stat-icon" style="color:#b98bff;background:rgba(125,77,255,0.12);border-color:rgba(125,77,255,0.14);">⚙</div>
-        </div>
-      </div>
-    </div>
+<div class="filters">
+<div>
+<label>Sort</label>
+<select id="sortSelect">
+<option value="newest">Newest</option>
+<option value="oldest">Oldest</option>
+<option value="name_asc">Name A-Z</option>
+<option value="name_desc">Name Z-A</option>
+</select>
+</div>
 
-    <div class="layout">
-      <div class="panel">
-        <div class="panel-title">Find a Server</div>
+<div>
+<label>Server Type</label>
+<select id="typeFilter">
+<option value="">All</option>
+<option value="modded">Modded</option>
+<option value="vanilla">Vanilla</option>
+</select>
+</div>
+</div>
 
-        <div class="search-top">
-          <input id="searchInput" type="text" placeholder="Search by name, description, or invite code" />
-        </div>
+<div id="serverList"></div>
+</div>
 
-        <div class="search-actions">
-          <button class="btn btn-refresh" id="refreshBtn" type="button">Refresh</button>
-          <button class="btn btn-search" id="searchBtn" type="button">Search</button>
-          <button class="btn btn-clear" id="clearBtn" type="button">Clear Filters</button>
-        </div>
+<div class="panel">
+<h2>Post Server</h2>
 
-        <div class="filters">
-          <div>
-            <label for="sortSelect">Sort:</label>
-            <select id="sortSelect">
-              <option value="newest">Newest</option>
-              <option value="oldest">Oldest</option>
-              <option value="name_asc">Name A-Z</option>
-              <option value="name_desc">Name Z-A</option>
-              <option value="players_high">Max Players High-Low</option>
-              <option value="players_low">Max Players Low-High</option>
-            </select>
-          </div>
+<form id="form">
+<input name="name" placeholder="Server Name" required><br><br>
+<input name="description" placeholder="Description"><br><br>
+<input name="invite_code" placeholder="Invite Code" required><br><br>
 
-          <div>
-            <label for="typeFilter">Server Type:</label>
-            <select id="typeFilter">
-              <option value="">All Servers</option>
-              <option value="modded">Modded</option>
-              <option value="vanilla">Vanilla</option>
-            </select>
-          </div>
+<select name="server_type">
+<option value="modded">Modded</option>
+<option value="vanilla">Vanilla</option>
+</select><br><br>
 
-          <div>
-            <label for="playersFilter">Max Players:</label>
-            <select id="playersFilter">
-              <option value="">Any Player Count</option>
-              <option value="25">25+</option>
-              <option value="50">50+</option>
-              <option value="75">75+</option>
-              <option value="100">100+</option>
-            </select>
-          </div>
-        </div>
+<button class="btn btn-search">Post</button>
+</form>
+</div>
 
-        <div id="serverList" class="server-list"></div>
-      </div>
+</div>
 
-      <div class="panel">
-        <div class="panel-title">Post Your Server</div>
+<script>
+const SUPABASE_URL = "https://yfzifzllysjuglaywsdn.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        <form id="serverForm">
-          <div>
-            <label>Server Name</label>
-            <input name="name" placeholder="Enter server name" required />
-          </div>
+let ownerToken = localStorage.getItem("owner_token");
+if (!ownerToken) {
+  ownerToken = crypto.randomUUID();
+  localStorage.setItem("owner_token", ownerToken);
+}
 
-          <div class="spacer-16"></div>
+let allServers = [];
 
-          <div>
-            <label>Description</label>
-            <textarea name="description" placeholder="Enter description (optional)"></textarea>
-          </div>
+async function loadServers() {
+  const { data } = await db.from("servers").select("*").order("created_at",{ascending:false});
+  allServers = data || [];
+  render(allServers);
+}
 
-          <div class="spacer-16"></div>
+function applyFilters() {
+  const search = document.getElementById("searchInput").value.toLowerCase();
+  const type = document.getElementById("typeFilter").value;
+  const sort = document.getElementById("sortSelect").value;
 
-          <div>
-            <label>Invite Code</label>
-            <input name="invite_code" placeholder="Enter invite code" required />
-          </div>
+  let list = allServers.filter(s=>{
+    return (!search || s.name.toLowerCase().includes(search))
+    && (!type || s.server_type === type);
+  });
 
-          <div class="spacer-16"></div>
+  if (sort==="newest") list.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  if (sort==="oldest") list.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  if (sort==="name_asc") list.sort((a,b)=>a.name.localeCompare(b.name));
+  if (sort==="name_desc") list.sort((a,b)=>b.name.localeCompare(a.name));
 
-          <div>
-            <label>Max Player Count</label>
-            <input name="max_players" type="number" min="1" placeholder="Enter max player count" required />
-          </div>
+  render(list);
+}
 
-          <div class="spacer-16"></div>
+function render(list) {
+  const el = document.getElementById("serverList");
 
-          <div>
-            <label>Server Type</label>
-            <select name="server_type" required>
-              <option value="modded">Modded</option>
-              <option value="vanilla">Vanilla</option>
-            </select>
-          </div>
+  el.innerHTML = list.map(s=>{
+    const canDelete = s.owner_token === ownerToken;
 
-          <div class="spacer-16"></div>
+    return `
+    <div class="server">
+      <b>${s.name}</b>
+      <div class="meta">${s.server_type}</div>
+      <div>${s.description || ""}</div>
+      <div class="meta">${s.invite_code}</div>
 
-          <button class="btn btn-post" type="submit">Post Server</button>
-        </form>
+      <div class="actions">
+        ${canDelete ? `<button class="btn btn-delete" onclick="deleteServer('${s.id}')">Delete</button>` : ""}
       </div>
     </div>
+    `;
+  }).join("");
+}
 
-    <div class="footer">
-      Unofficial Community Project: This website is not affiliated with or endorsed by Windrose. The creator is not part of the official Windrose team.<br>
-      This project is made for the community and is not monetized or used to generate any income.<br>
-      All trademarks and game content belong to their respective owners.
-    </div>
-  </div>
+async function deleteServer(id) {
+  if (!confirm("Delete this?")) return;
 
-  <script>
-    const SUPABASE_URL = "https://yfzifzllysjuglaywsdn.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmemlmemxseXNqdWdsYXl3c2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NjE1MDEsImV4cCI6MjA5MjQzNzUwMX0.DDTLQUVT-74_eBHTkRBbNW37hwUfcF_Ztn8h9u5dQY0";
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  await db.from("servers")
+    .delete()
+    .eq("id",id)
+    .eq("owner_token",ownerToken);
 
-    let allServers = [];
+  loadServers();
+}
 
-    let ownerToken = localStorage.getItem("windrose_owner_token");
-    if (!ownerToken) {
-      ownerToken = crypto.randomUUID();
-      localStorage.setItem("windrose_owner_token", ownerToken);
-    }
+document.getElementById("form").onsubmit = async e=>{
+  e.preventDefault();
+  const f = new FormData(e.target);
 
-    function escapeHtml(text) {
-      if (text === null || text === undefined) return "";
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
-    }
+  await db.from("servers").insert([{
+    name:f.get("name"),
+    description:f.get("description"),
+    invite_code:f.get("invite_code"),
+    server_type:f.get("server_type"),
+    owner_token:ownerToken
+  }]);
 
-    function formatDate(dateStr) {
-      if (!dateStr) return "Unknown date";
-      return new Date(dateStr).toLocaleDateString();
-    }
+  e.target.reset();
+  loadServers();
+};
 
-    function updateFilterCount() {
-      let count = 0;
-      if (document.getElementById("searchInput").value.trim()) count++;
-      if (document.getElementById("typeFilter").value) count++;
-      if (document.getElementById("playersFilter").value) count++;
-      if (document.getElementById("sortSelect").value !== "newest") count++;
-      document.getElementById("activeFilterCount").textContent = count;
-    }
+document.getElementById("searchBtn").onclick = applyFilters;
+document.getElementById("refreshBtn").onclick = loadServers;
+document.getElementById("clearBtn").onclick = ()=>{
+  document.getElementById("searchInput").value="";
+  document.getElementById("typeFilter").value="";
+  document.getElementById("sortSelect").value="newest";
+  applyFilters();
+};
 
-    async function loadServers() {
-      const { data, error } = await db
-        .from("servers")
-        .select("*")
-        .order("created_at", { ascending: false });
+window.deleteServer = deleteServer;
 
-      if (error) {
-        document.getElementById("serverList").innerHTML = `
-          <div class="server-card">
-            <div class="server-name">Error loading servers</div>
-            <div class="server-desc">${escapeHtml(error.message)}</div>
-          </div>
-        `;
-        return;
-      }
+loadServers();
+</script>
 
-      allServers = data || [];
-      document.getElementById("totalServers").textContent = allServers.length;
-      applyFilters();
-    }
-
-    function applyFilters() {
-      const search = document.getElementById("searchInput").value.trim().toLowerCase();
-      const typeFilter = document.getElementById("typeFilter").value;
-      const playersFilter = document.getElementById("playersFilter").value;
-      const sortValue = document.getElementById("sortSelect").value;
-
-      let filtered = [...allServers].filter(server => {
-        const name = (server.name || "").toLowerCase();
-        const desc = (server.description || "").toLowerCase();
-        const invite = (server.invite_code || "").toLowerCase();
-        const type = (server.server_type || "").toLowerCase();
-        const maxPlayers = Number(server.max_players || 0);
-
-        const matchesSearch =
-          !search ||
-          name.includes(search) ||
-          desc.includes(search) ||
-          invite.includes(search);
-
-        const matchesType = !typeFilter || type === typeFilter;
-        const matchesPlayers = !playersFilter || maxPlayers >= Number(playersFilter);
-
-        return matchesSearch && matchesType && matchesPlayers;
-      });
-
-      if (sortValue === "newest") {
-        filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-      } else if (sortValue === "oldest") {
-        filtered.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
-      } else if (sortValue === "name_asc") {
-        filtered.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-      } else if (sortValue === "name_desc") {
-        filtered.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
-      } else if (sortValue === "players_high") {
-        filtered.sort((a, b) => Number(b.max_players || 0) - Number(a.max_players || 0));
-      } else if (sortValue === "players_low") {
-        filtered.sort((a, b) => Number(a.max_players || 0) - Number(b.max_players || 0));
-      }
-
-      document.getElementById("filteredServers").textContent = filtered.length;
-      updateFilterCount();
-      renderServers(filtered);
-    }
-
-    function renderServers(servers) {
-      const box = document.getElementById("serverList");
-
-      if (!servers.length) {
-        box.innerHTML = `
-          <div class="server-card">
-            <div class="server-name">No servers found</div>
-            <div class="server-desc">Try changing your search or filters.</div>
-          </div>
-        `;
-        return;
-      }
-
-      box.innerHTML = servers.map(server => {
-        const type = server.server_type || "unknown";
-        const desc = server.description && server.description.trim()
-          ? server.description
-          : "No description provided.";
-
-        const canDelete = server.owner_token && server.owner_token === ownerToken;
-
-        return `
-          <div class="server-card">
-            <div class="server-card-top">
-              <div>
-                <div class="server-name">${escapeHtml(server.name || "Untitled Server")}</div>
-              </div>
-              <div class="server-type-pill">${escapeHtml(type.charAt(0).toUpperCase() + type.slice(1))}</div>
-            </div>
-
-            <div class="server-desc">${escapeHtml(desc)}</div>
-
-            <div class="meta-row">
-              <div class="meta-pill">${escapeHtml(server.max_players ? server.max_players + " Players" : "No Player Limit Set")}</div>
-              <div class="meta-pill">Posted ${escapeHtml(formatDate(server.created_at))}</div>
-            </div>
-
-            <div class="card-bottom">
-              <button class="copy-btn" onclick="copyInvite(${JSON.stringify(server.invite_code || "")})">Copy Invite Code</button>
-              <div class="invite-text">Invite Code: <span class="meta-pill">${escapeHtml(server.invite_code || "")}</span></div>
-              ${canDelete ? `<button class="btn btn-delete" type="button" onclick="deleteServer('${server.id}')">Delete</button>` : ""}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    async function copyInvite(code) {
-      try {
-        await navigator.clipboard.writeText(code);
-        alert("Invite code copied");
-      } catch {
-        alert("Could not copy invite code");
-      }
-    }
-
-    async function deleteServer(id) {
-      const ok = confirm("Delete this server post?");
-      if (!ok) return;
-
-      const { error } = await db
-        .from("servers")
-        .delete()
-        .eq("id", id)
-        .eq("owner_token", ownerToken);
-
-      if (error) {
-        alert("Delete failed: " + error.message);
-        return;
-      }
-
-      loadServers();
-    }
-
-    document.getElementById("serverForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const form = new FormData(e.target);
-
-      const payload = {
-        name: form.get("name"),
-        description: form.get("description"),
-        invite_code: form.get("invite_code"),
-        max_players: Number(form.get("max_players")),
-        server_type: form.get("server_type"),
-        owner_token: ownerToken
-      };
-
-      const { error } = await db.from("servers").insert([payload]);
-
-      if (error) {
-        alert("Post failed: " + error.message);
-        return;
-      }
-
-      e.target.reset();
-      loadServers();
-    });
-
-    document.getElementById("searchBtn").addEventListener("click", applyFilters);
-    document.getElementById("refreshBtn").addEventListener("click", loadServers);
-    document.getElementById("searchInput").addEventListener("input", applyFilters);
-    document.getElementById("sortSelect").addEventListener("change", applyFilters);
-    document.getElementById("typeFilter").addEventListener("change", applyFilters);
-    document.getElementById("playersFilter").addEventListener("change", applyFilters);
-
-    document.getElementById("clearBtn").addEventListener("click", () => {
-      document.getElementById("searchInput").value = "";
-      document.getElementById("sortSelect").value = "newest";
-      document.getElementById("typeFilter").value = "";
-      document.getElementById("playersFilter").value = "";
-      applyFilters();
-    });
-
-    window.copyInvite = copyInvite;
-    window.deleteServer = deleteServer;
-
-    loadServers();
-  </script>
 </body>
 </html>
