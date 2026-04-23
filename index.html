@@ -602,7 +602,7 @@
 
             <div class="field">
               <label for="max_players">Max Player Count</label>
-              <input id="max_players" name="max_players" type="number" min="1" placeholder="Enter max player count (optional)" />
+              <input id="max_players" name="max_players" type="number" min="1" required placeholder="Enter max player count" />
             </div>
 
             <div class="field">
@@ -973,7 +973,7 @@
         name: String(formData.get('name') || '').trim(),
         description: String(formData.get('description') || '').trim(),
         invite_code: String(formData.get('invite_code') || '').trim(),
-        max_players: formData.get('max_players') ? Number(formData.get('max_players')) : null,
+        max_players: Number(formData.get('max_players')),
         modded: String(formData.get('modded')) === 'true',
         tags: normalizeTags(formData.get('tags')),
         owner_token_hash: ownerTokenHash
@@ -981,6 +981,11 @@
 
       if (!payload.name || !payload.invite_code) {
         showStatus('Server name and invite code are required.', 'error');
+        return;
+      }
+
+      if (!payload.max_players || payload.max_players < 1) {
+        showStatus('Max player count is required.', 'error');
         return;
       }
 
