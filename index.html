@@ -603,7 +603,7 @@
             </div>
 
             <div class="card-bottom">
-              <button class="copy-btn" onclick="copyInvite(${JSON.stringify(server.invite_code || "")})">Copy Invite Code</button>
+              <button class="copy-btn" onclick='copyInvite(${JSON.stringify(server.invite_code || "")})'>Copy Invite Code</button>
               <div class="invite-text">Invite Code: <span class="meta-pill">${escapeHtml(server.invite_code || "")}</span></div>
               ${canDelete ? `<button class="btn btn-delete" type="button" onclick="deleteServer('${server.id}')">Delete</button>` : ""}
             </div>
@@ -614,10 +614,25 @@
 
     async function copyInvite(code) {
       try {
-        await navigator.clipboard.writeText(code);
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(code);
+        } else {
+          const textArea = document.createElement("textarea");
+          textArea.value = code;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-999999px";
+          textArea.style.top = "-999999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          document.execCommand("copy");
+          textArea.remove();
+        }
+
         alert("Invite code copied");
-      } catch {
-        alert("Could not copy invite code");
+      } catch (err) {
+        alert("Copy failed");
+        console.error(err);
       }
     }
 
@@ -677,8 +692,8 @@
       applyFilters();
     });
 
-    window.copyInvite = copyInvite;
     window.deleteServer = deleteServer;
+    window.copyInvite = copyInvite;
 
     loadServers();
   </script>
