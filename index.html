@@ -149,17 +149,14 @@
     }
 
     .search-top {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 112px;
-      gap: 10px;
-      align-items: start;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .search-actions {
       display: flex;
-      flex-direction: column;
       gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
     }
 
     input, textarea, select {
@@ -193,26 +190,28 @@
     .btn {
       border: none;
       border-radius: 14px;
-      padding: 13px 12px;
+      padding: 13px 18px;
       font-size: 15px;
       font-weight: 800;
       color: white;
       cursor: pointer;
-      width: 100%;
       min-height: 48px;
     }
 
     .btn-refresh {
       background: #263b63;
+      min-width: 120px;
     }
 
     .btn-search,
     .btn-post {
       background: linear-gradient(90deg, #5e7cff, #d44dcb);
+      min-width: 120px;
     }
 
     .btn-clear {
       background: #3b2f77;
+      min-width: 140px;
     }
 
     .filters {
@@ -323,14 +322,6 @@
       .filters {
         grid-template-columns: 1fr;
       }
-
-      .search-top {
-        grid-template-columns: 1fr;
-      }
-
-      .search-actions {
-        flex-direction: row;
-      }
     }
 
     @media (max-width: 700px) {
@@ -339,6 +330,7 @@
       .stat-value { font-size: 42px; }
       .server-card-top { flex-direction: column; }
       .search-actions { flex-direction: column; }
+      .btn { width: 100%; }
     }
   </style>
 </head>
@@ -387,11 +379,12 @@
 
         <div class="search-top">
           <input id="searchInput" type="text" placeholder="Search by name, description, or invite code" />
-          <div class="search-actions">
-            <button class="btn btn-refresh" id="refreshBtn" type="button">Refresh</button>
-            <button class="btn btn-search" id="searchBtn" type="button">Search</button>
-            <button class="btn btn-clear" id="clearBtn" type="button">Clear Filters</button>
-          </div>
+        </div>
+
+        <div class="search-actions">
+          <button class="btn btn-refresh" id="refreshBtn" type="button">Refresh</button>
+          <button class="btn btn-search" id="searchBtn" type="button">Search</button>
+          <button class="btn btn-clear" id="clearBtn" type="button">Clear Filters</button>
         </div>
 
         <div class="filters">
