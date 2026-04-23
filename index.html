@@ -10,7 +10,6 @@
       --bg: #060d1d;
       --bg-2: #0a1329;
       --panel: #0d1832;
-      --panel-2: #101d3b;
       --border: rgba(119, 146, 213, 0.18);
       --text: #f4f7ff;
       --muted: #9ca9c9;
@@ -19,12 +18,9 @@
       --accent-3: #1de0c3;
       --chip: #142241;
       --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-      --radius: 22px;
     }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
@@ -35,494 +31,76 @@
         linear-gradient(180deg, var(--bg), var(--bg-2));
       min-height: 100vh;
     }
-
-    a { color: inherit; text-decoration: none; }
-
-    .wrap {
-      width: min(1320px, calc(100% - 24px));
-      margin: 0 auto;
-      padding: 22px 0 40px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-weight: 800;
-      font-size: 26px;
-    }
-
-    .brand-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 10px 25px rgba(109, 124, 255, 0.28);
-    }
-
-    .about-btn,
-    .primary-btn,
-    .secondary-btn,
-    .ghost-btn,
-    .icon-btn,
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    .about-btn,
-    .primary-btn,
-    .secondary-btn,
-    .ghost-btn,
-    .icon-btn,
-    .search-btn,
-    .favorite-btn,
-    .copy-btn,
-    .refresh-btn,
-    .clear-btn,
-    .delete-btn {
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      transition: 0.18s ease;
-    }
-
-    .about-btn,
-    .secondary-btn,
-    .refresh-btn,
-    .clear-btn,
-    .copy-btn,
-    .favorite-btn,
-    .ghost-btn,
-    .delete-btn {
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 12px 16px;
-    }
-
-    .primary-btn,
-    .search-btn {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: white;
-      padding: 14px 18px;
-      font-weight: 700;
-      box-shadow: 0 12px 30px rgba(149, 102, 255, 0.24);
-    }
-
-    .delete-btn {
-      border-color: rgba(255, 87, 133, 0.24);
-      color: #ffd3df;
-    }
-
-    .about-btn:hover,
-    .primary-btn:hover,
-    .secondary-btn:hover,
-    .ghost-btn:hover,
-    .icon-btn:hover,
-    .search-btn:hover,
-    .favorite-btn:hover,
-    .copy-btn:hover,
-    .refresh-btn:hover,
-    .clear-btn:hover,
-    .delete-btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
-    }
-
-    .stats-grid,
-    .main-grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    .stats-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      margin-bottom: 18px;
-    }
-
-    .main-grid {
-      grid-template-columns: 1.62fr 1fr;
-      align-items: start;
-    }
-
-    .panel,
-    .stats-card {
-      background: linear-gradient(180deg, rgba(15, 24, 50, 0.96), rgba(10, 19, 41, 0.96));
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-    }
-
-    .stats-card {
-      padding: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 118px;
-    }
-
-    .stats-label {
-      color: var(--muted);
-      font-size: 15px;
-      margin-bottom: 10px;
-      font-weight: 700;
-    }
-
-    .stats-value {
-      font-size: 50px;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .stats-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      background: rgba(109, 124, 255, 0.12);
-      border: 1px solid rgba(109, 124, 255, 0.2);
-      color: #90a3ff;
-      font-size: 23px;
-    }
-
-    .stats-icon.filter { color: #d06bff; background: rgba(201, 83, 200, 0.13); border-color: rgba(201, 83, 200, 0.22); }
-    .stats-icon.tag { color: #b39eff; background: rgba(139, 92, 246, 0.13); border-color: rgba(139, 92, 246, 0.22); }
-
-    .panel { padding: 22px; }
-
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 800;
-    }
-
-    .search-block {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .search-input,
-    .field input,
-    .field select,
-    .field textarea {
-      width: 100%;
-      background: rgba(255,255,255,0.03);
-      color: var(--text);
-      border: 1px solid rgba(118, 142, 208, 0.15);
-      border-radius: 16px;
-      padding: 16px 18px;
-      outline: none;
-    }
-
-    .search-input::placeholder,
-    .field input::placeholder,
-    .field textarea::placeholder { color: #7f8caf; }
-
-    .search-input:focus,
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus {
-      border-color: rgba(109, 124, 255, 0.5);
-      box-shadow: 0 0 0 3px rgba(109, 124, 255, 0.12);
-    }
-
-    .action-column {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .sub-label {
-      color: var(--text);
-      font-weight: 700;
-      font-size: 16px;
-      margin: 4px 0 12px;
-    }
-
-    .tag-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .tag-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 16px;
-      border-radius: 14px;
-      background: var(--chip);
-      border: 1px solid rgba(118, 142, 208, 0.14);
-      color: #dce5ff;
-      cursor: pointer;
-      user-select: none;
-      transition: 0.18s ease;
-      font-weight: 700;
-    }
-
-    .tag-chip:hover {
-      transform: translateY(-1px);
-      border-color: rgba(109, 124, 255, 0.34);
-    }
-
-    .tag-chip.active {
-      background: linear-gradient(135deg, rgba(109, 124, 255, 0.24), rgba(201, 83, 200, 0.2));
-      border-color: rgba(124, 136, 255, 0.38);
-    }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .field label {
-      display: block;
-      margin-bottom: 8px;
-      color: #dfe7ff;
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    .field textarea {
-      min-height: 116px;
-      resize: vertical;
-    }
-
-    .helper {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 8px;
-      line-height: 1.35;
-    }
-
-    .field-grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    .server-list {
-      display: grid;
-      gap: 16px;
-    }
-
-    .server-card {
-      background: linear-gradient(180deg, rgba(20, 31, 61, 0.7), rgba(13, 24, 50, 0.82));
-      border: 1px solid rgba(118, 142, 208, 0.15);
-      border-radius: 18px;
-      padding: 18px;
-    }
-
-    .server-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 12px;
-    }
-
-    .server-name {
-      margin: 0 0 10px;
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .server-desc {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.5;
-      font-size: 15px;
-    }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 74px;
-      height: 40px;
-      border-radius: 14px;
-      padding: 0 14px;
-      font-weight: 800;
-      font-size: 14px;
-      white-space: nowrap;
-    }
-
-    .status-pill.modded {
-      background: rgba(96, 112, 255, 0.16);
-      border: 1px solid rgba(96, 112, 255, 0.26);
-      color: #aab7ff;
-    }
-
-    .status-pill.vanilla {
-      background: rgba(29, 224, 195, 0.12);
-      border: 1px solid rgba(29, 224, 195, 0.24);
-      color: #6ef4dc;
-    }
-
-    .meta-row,
-    .server-tags,
-    .server-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .meta-row { margin: 14px 0; }
-    .server-tags { margin-bottom: 16px; }
-
-    .meta-pill,
-    .mini-tag {
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(118, 142, 208, 0.12);
-      border-radius: 12px;
-      padding: 10px 12px;
-      color: #d9e3ff;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .mini-tag { cursor: pointer; }
-
-    .mini-tag.active {
-      background: linear-gradient(135deg, rgba(109, 124, 255, 0.22), rgba(201, 83, 200, 0.16));
-      border-color: rgba(109, 124, 255, 0.34);
-    }
-
-    .favorite-btn.active {
-      background: linear-gradient(135deg, rgba(109, 124, 255, 0.24), rgba(201, 83, 200, 0.22));
-      border-color: rgba(201, 83, 200, 0.36);
-      color: #fff;
-    }
-
-    .invite-code {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 14px;
-      min-height: 44px;
-    }
-
-    .empty {
-      padding: 28px 18px;
-      border-radius: 18px;
-      border: 1px dashed rgba(118, 142, 208, 0.22);
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.5;
-    }
-
-    .status-message {
-      margin-top: 14px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      display: none;
-      font-weight: 700;
-    }
-
-    .status-message.show { display: block; }
-    .status-message.success {
-      background: rgba(29, 224, 195, 0.12);
-      border: 1px solid rgba(29, 224, 195, 0.22);
-      color: #9ff6e7;
-    }
-    .status-message.error {
-      background: rgba(255, 87, 133, 0.12);
-      border: 1px solid rgba(255, 87, 133, 0.24);
-      color: #ffc5d6;
-    }
-
-    .footer-note {
-      margin-top: 20px;
-      background: linear-gradient(180deg, rgba(13, 24, 50, 0.96), rgba(10, 19, 41, 0.96));
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
-      color: #c5d0ef;
-      line-height: 1.6;
-      font-size: 14px;
-    }
-
-    .favorites-toggle { margin-bottom: 14px; }
-
-    @media (max-width: 1080px) {
-      .main-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 780px) {
-      .stats-grid,
-      .toolbar,
-      .search-block { grid-template-columns: 1fr; }
-
-      .server-top,
-      .topbar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .stats-value { font-size: 38px; }
-      .brand { font-size: 22px; }
-    }
+    .wrap { width: min(1320px, calc(100% - 24px)); margin: 0 auto; padding: 22px 0 40px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
+    .brand { display:flex; align-items:center; gap:14px; font-weight:800; font-size:26px; }
+    .brand-icon { width:34px; height:34px; border-radius:12px; display:grid; place-items:center; background:linear-gradient(135deg, var(--accent), var(--accent-2)); }
+    .about-btn,.search-btn,.clear-btn,.refresh-btn,.copy-btn,.favorite-btn,.delete-btn,.ghost-btn,.primary-btn,button,input,select,textarea { font:inherit; }
+    .about-btn,.clear-btn,.refresh-btn,.copy-btn,.favorite-btn,.delete-btn,.ghost-btn { background:rgba(255,255,255,.04); color:var(--text); border:1px solid var(--border); padding:12px 16px; border-radius:14px; cursor:pointer; }
+    .search-btn,.primary-btn { background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff; padding:14px 18px; font-weight:700; border:none; border-radius:14px; cursor:pointer; }
+    .delete-btn { border-color: rgba(255, 87, 133, 0.24); color: #ffd3df; }
+    .stats-grid,.main-grid { display:grid; gap:18px; }
+    .stats-grid { grid-template-columns:repeat(3,minmax(0,1fr)); margin-bottom:18px; }
+    .main-grid { grid-template-columns:1.62fr 1fr; align-items:start; }
+    .stats-card,.panel { background:linear-gradient(180deg, rgba(15,24,50,.96), rgba(10,19,41,.96)); border:1px solid var(--border); border-radius:24px; box-shadow:var(--shadow); }
+    .stats-card { padding:22px; display:flex; align-items:center; justify-content:space-between; min-height:118px; }
+    .stats-label { color:var(--muted); font-size:15px; margin-bottom:10px; font-weight:700; }
+    .stats-value { font-size:50px; font-weight:800; line-height:1; }
+    .stats-icon { width:54px; height:54px; border-radius:18px; display:grid; place-items:center; background:rgba(109,124,255,.12); border:1px solid rgba(109,124,255,.2); color:#90a3ff; font-size:23px; }
+    .panel { padding:22px; }
+    .panel-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px; }
+    .section-title { margin:0; font-size:24px; font-weight:800; }
+    .search-block { display:grid; grid-template-columns:1fr auto; gap:14px; margin-bottom:14px; }
+    .action-column { display:flex; flex-direction:column; gap:12px; }
+    .search-input,.field input,.field select,.field textarea { width:100%; background:rgba(255,255,255,.03); color:var(--text); border:1px solid rgba(118,142,208,.15); border-radius:16px; padding:16px 18px; outline:none; }
+    .sub-label { color:var(--text); font-weight:700; font-size:16px; margin:4px 0 12px; }
+    .tag-list { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+    .tag-chip { display:inline-flex; align-items:center; gap:8px; padding:12px 16px; border-radius:14px; background:var(--chip); border:1px solid rgba(118,142,208,.14); color:#dce5ff; cursor:pointer; user-select:none; font-weight:700; }
+    .tag-chip.active { background:linear-gradient(135deg, rgba(109,124,255,.24), rgba(201,83,200,.2)); border-color:rgba(124,136,255,.38); }
+    .tag-count { opacity:.7; font-size:12px; }
+    .toolbar { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-bottom:18px; }
+    .field label { display:block; margin-bottom:8px; color:#dfe7ff; font-size:15px; font-weight:700; }
+    .field textarea { min-height:116px; resize:vertical; }
+    .helper { color:var(--muted); font-size:13px; margin-top:8px; line-height:1.35; }
+    .field-grid { display:grid; gap:16px; }
+    .server-list { display:grid; gap:16px; }
+    .server-card { background:linear-gradient(180deg, rgba(20,31,61,.7), rgba(13,24,50,.82)); border:1px solid rgba(118,142,208,.15); border-radius:18px; padding:18px; }
+    .server-top { display:flex; justify-content:space-between; gap:16px; margin-bottom:12px; }
+    .server-name { margin:0 0 10px; font-size:20px; font-weight:800; }
+    .server-desc { margin:0; color:var(--muted); line-height:1.5; font-size:15px; }
+    .status-pill { display:inline-flex; align-items:center; justify-content:center; min-width:74px; height:40px; border-radius:14px; padding:0 14px; font-weight:800; font-size:14px; white-space:nowrap; }
+    .status-pill.modded { background:rgba(96,112,255,.16); border:1px solid rgba(96,112,255,.26); color:#aab7ff; }
+    .status-pill.vanilla { background:rgba(29,224,195,.12); border:1px solid rgba(29,224,195,.24); color:#6ef4dc; }
+    .meta-row,.server-tags,.server-actions { display:flex; flex-wrap:wrap; gap:10px; }
+    .meta-row { margin:14px 0; }
+    .server-tags { margin-bottom:16px; }
+    .meta-pill,.mini-tag { background:rgba(255,255,255,.045); border:1px solid rgba(118,142,208,.12); border-radius:12px; padding:10px 12px; color:#d9e3ff; font-size:14px; font-weight:700; }
+    .mini-tag { cursor:pointer; }
+    .mini-tag.active { background:linear-gradient(135deg, rgba(109,124,255,.22), rgba(201,83,200,.16)); border-color:rgba(109,124,255,.34); }
+    .favorite-btn.active { background:linear-gradient(135deg, rgba(109,124,255,.24), rgba(201,83,200,.22)); border-color:rgba(201,83,200,.36); color:#fff; }
+    .invite-code { display:inline-flex; align-items:center; gap:8px; color:var(--muted); font-size:14px; min-height:44px; }
+    .empty { padding:28px 18px; border-radius:18px; border:1px dashed rgba(118,142,208,.22); color:var(--muted); text-align:center; line-height:1.5; }
+    .status-message { margin-top:14px; padding:14px 16px; border-radius:16px; display:none; font-weight:700; }
+    .status-message.show { display:block; }
+    .status-message.success { background:rgba(29,224,195,.12); border:1px solid rgba(29,224,195,.22); color:#9ff6e7; }
+    .status-message.error { background:rgba(255,87,133,.12); border:1px solid rgba(255,87,133,.24); color:#ffc5d6; }
+    .footer-note { margin-top:20px; background:linear-gradient(180deg, rgba(13,24,50,.96), rgba(10,19,41,.96)); border:1px solid var(--border); border-radius:18px; padding:18px; color:#c5d0ef; line-height:1.6; font-size:14px; }
+    .favorites-toggle { margin-bottom:14px; }
+    @media (max-width:1080px){ .main-grid{grid-template-columns:1fr;} }
+    @media (max-width:780px){ .stats-grid,.toolbar,.search-block{grid-template-columns:1fr;} .server-top,.topbar{flex-direction:column;align-items:stretch;} .stats-value{font-size:38px;} .brand{font-size:22px;} }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header class="topbar">
-      <div class="brand">
-        <div class="brand-icon">✦</div>
-        <div>Windrose Server Finder</div>
-      </div>
+      <div class="brand"><div class="brand-icon">✦</div><div>Windrose Server Finder</div></div>
       <button class="about-btn" type="button" onclick="document.getElementById('footerNote').scrollIntoView({ behavior: 'smooth' })">ⓘ About</button>
     </header>
 
     <section class="stats-grid">
-      <div class="stats-card">
-        <div>
-          <div class="stats-label">Total Servers</div>
-          <div class="stats-value" id="totalServers">0</div>
-        </div>
-        <div class="stats-icon">▤</div>
-      </div>
-      <div class="stats-card">
-        <div>
-          <div class="stats-label">Filtered Results</div>
-          <div class="stats-value" id="filteredServers">0</div>
-        </div>
-        <div class="stats-icon filter">⏷</div>
-      </div>
-      <div class="stats-card">
-        <div>
-          <div class="stats-label">Selected Tags</div>
-          <div class="stats-value" id="selectedTagsCount">0</div>
-        </div>
-        <div class="stats-icon tag">🏷</div>
-      </div>
+      <div class="stats-card"><div><div class="stats-label">Total Servers</div><div class="stats-value" id="totalServers">0</div></div><div class="stats-icon">▤</div></div>
+      <div class="stats-card"><div><div class="stats-label">Filtered Results</div><div class="stats-value" id="filteredServers">0</div></div><div class="stats-icon">⏷</div></div>
+      <div class="stats-card"><div><div class="stats-label">Selected Tags</div><div class="stats-value" id="selectedTagsCount">0</div></div><div class="stats-icon">🏷</div></div>
     </section>
 
     <main class="main-grid">
@@ -544,31 +122,9 @@
         <div id="tagFilters" class="tag-list"></div>
 
         <div class="toolbar">
-          <div class="field">
-            <label for="sortSelect">Sort:</label>
-            <select id="sortSelect">
-              <option value="newest">Newest</option>
-              <option value="name_asc">Name A-Z</option>
-              <option value="name_desc">Name Z-A</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="moddedFilter">Server Type:</label>
-            <select id="moddedFilter">
-              <option value="all">All Servers</option>
-              <option value="modded">Modded</option>
-              <option value="vanilla">Vanilla</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="playersFilter">Max Players:</label>
-            <select id="playersFilter">
-              <option value="all">Any Player Count</option>
-              <option value="small">1-25</option>
-              <option value="medium">26-64</option>
-              <option value="large">65+</option>
-            </select>
-          </div>
+          <div class="field"><label for="sortSelect">Sort:</label><select id="sortSelect"><option value="newest">Newest</option><option value="name_asc">Name A-Z</option><option value="name_desc">Name Z-A</option></select></div>
+          <div class="field"><label for="moddedFilter">Server Type:</label><select id="moddedFilter"><option value="all">All Servers</option><option value="modded">Modded</option><option value="vanilla">Vanilla</option></select></div>
+          <div class="field"><label for="playersFilter">Max Players:</label><select id="playersFilter"><option value="all">Any Player Count</option><option value="small">1-25</option><option value="medium">26-64</option><option value="large">65+</option></select></div>
         </div>
 
         <div class="favorites-toggle">
@@ -579,51 +135,22 @@
       </section>
 
       <section class="panel">
-        <div class="panel-head">
-          <h2 class="section-title">Post Your Server</h2>
-        </div>
-
+        <div class="panel-head"><h2 class="section-title">Post Your Server</h2></div>
         <form id="serverForm">
           <div class="field-grid">
-            <div class="field">
-              <label for="name">Server Name</label>
-              <input id="name" name="name" type="text" placeholder="Enter server name" required />
-            </div>
-
-            <div class="field">
-              <label for="description">Description</label>
-              <textarea id="description" name="description" placeholder="Enter description (optional)"></textarea>
-            </div>
-
-            <div class="field">
-              <label for="invite_code">Invite Code</label>
-              <input id="invite_code" name="invite_code" type="text" placeholder="Enter invite code" required />
-            </div>
-
-            <div class="field">
-              <label for="max_players">Max Player Count</label>
-              <input id="max_players" name="max_players" type="number" min="1" required placeholder="Enter max player count" />
-            </div>
-
-            <div class="field">
-              <label for="modded">Server Type</label>
-              <select id="modded" name="modded">
-                <option value="true">Modded</option>
-                <option value="false">Vanilla</option>
-              </select>
-            </div>
-
+            <div class="field"><label for="name">Server Name</label><input id="name" name="name" type="text" placeholder="Enter server name" required /></div>
+            <div class="field"><label for="description">Description</label><textarea id="description" name="description" placeholder="Enter description (optional)"></textarea></div>
+            <div class="field"><label for="invite_code">Invite Code</label><input id="invite_code" name="invite_code" type="text" placeholder="Enter invite code" required /></div>
+            <div class="field"><label for="max_players">Max Player Count</label><input id="max_players" name="max_players" type="number" min="1" required placeholder="Enter max player count" /></div>
+            <div class="field"><label for="modded">Server Type</label><select id="modded" name="modded"><option value="true">Modded</option><option value="false">Vanilla</option></select></div>
             <div class="field">
               <label>Choose Tags</label>
               <div id="postTagButtons" class="tag-list"></div>
-              <input id="tags" name="tags" type="hidden" />
               <div class="helper">Tap up to 5 tags for your server post.</div>
             </div>
-
             <button class="primary-btn" type="submit">Post Server</button>
           </div>
         </form>
-
         <div class="status-message" id="formStatus"></div>
       </section>
     </main>
@@ -638,15 +165,14 @@
     const SUPABASE_URL = "YOUR_SUPABASE_URL";
     const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
     const TABLE_NAME = "servers";
-
     const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let allServers = [];
     let filteredServers = [];
     let activeTags = new Set();
+    let selectedPostTags = [];
     let currentSearch = "";
     let favoritesOnly = false;
-    let selectedPostTags = [];
 
     const PRESET_TAGS = [
       { label: "New Player Friendly", icon: "🌿", value: "new player friendly" },
@@ -669,6 +195,7 @@
 
     const serverListEl = document.getElementById("serverList");
     const tagFiltersEl = document.getElementById("tagFilters");
+    const postTagButtonsEl = document.getElementById("postTagButtons");
     const searchInputEl = document.getElementById("searchInput");
     const searchBtnEl = document.getElementById("searchBtn");
     const clearFiltersBtnEl = document.getElementById("clearFiltersBtn");
@@ -677,34 +204,41 @@
     const playersFilterEl = document.getElementById("playersFilter");
     const refreshBtnEl = document.getElementById("refreshBtn");
     const favoritesOnlyBtnEl = document.getElementById("favoritesOnlyBtn");
-
     const totalServersEl = document.getElementById("totalServers");
     const filteredServersEl = document.getElementById("filteredServers");
     const selectedTagsCountEl = document.getElementById("selectedTagsCount");
     const serverFormEl = document.getElementById("serverForm");
     const formStatusEl = document.getElementById("formStatus");
-    const postTagButtonsEl = document.getElementById("postTagButtons");
+
+    function escapeHtml(text) {
+      return String(text ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function titleCase(text) {
+      return String(text).split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+    }
+
+    function showStatus(message, type = "success") {
+      formStatusEl.textContent = message;
+      formStatusEl.className = `status-message show ${type}`;
+    }
+
+    function normalizeTags(tags) {
+      if (!tags) return [];
+      if (Array.isArray(tags)) {
+        return tags.map(t => String(t).trim().toLowerCase()).filter(t => t && !BANNED_TAGS.includes(t));
+      }
+      return String(tags).split(",").map(t => t.trim().toLowerCase()).filter(t => t && !BANNED_TAGS.includes(t));
+    }
 
     function getFavorites() {
-      try {
-        return JSON.parse(localStorage.getItem("windroseFavorites") || "[]");
-      } catch {
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem("windroseFavorites") || "[]"); } catch { return []; }
     }
-
-    function saveFavorites(ids) {
-      localStorage.setItem("windroseFavorites", JSON.stringify(ids));
-    }
-
-    function isFavorite(id) {
-      return getFavorites().includes(id);
-    }
-
+    function saveFavorites(ids) { localStorage.setItem("windroseFavorites", JSON.stringify(ids)); }
+    function isFavorite(id) { return getFavorites().includes(id); }
     function toggleFavorite(id) {
       const favorites = getFavorites();
-      const exists = favorites.includes(id);
-      const next = exists ? favorites.filter(item => item !== id) : [...favorites, id];
+      const next = favorites.includes(id) ? favorites.filter(item => item !== id) : [...favorites, id];
       saveFavorites(next);
       applyFilters();
     }
@@ -714,113 +248,78 @@
       crypto.getRandomValues(array);
       return Array.from(array, b => b.toString(16).padStart(2, "0")).join("");
     }
-
     async function sha256(text) {
       const data = new TextEncoder().encode(text);
       const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
     }
-
     function getOwnedPosts() {
-      try {
-        return JSON.parse(localStorage.getItem("windroseOwnedPosts") || "{}");
-      } catch {
-        return {};
-      }
+      try { return JSON.parse(localStorage.getItem("windroseOwnedPosts") || "{}"); } catch { return {}; }
     }
-
-    function saveOwnedPosts(map) {
-      localStorage.setItem("windroseOwnedPosts", JSON.stringify(map));
-    }
-
-    function userOwnsPost(serverId) {
-      const owned = getOwnedPosts();
-      return !!owned[serverId];
-    }
-
-    function normalizeTags(tags) {
-      if (!tags) return [];
-
-      if (Array.isArray(tags)) {
-        return tags
-          .map(t => String(t).trim().toLowerCase())
-          .filter(t => t && !BANNED_TAGS.includes(t));
-      }
-
-      return String(tags)
-        .split(",")
-        .map(t => t.trim().toLowerCase())
-        .filter(t => t && !BANNED_TAGS.includes(t));
-    }
-
-    function escapeHtml(text) {
-      return String(text ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function titleCase(text) {
-      return String(text)
-        .split(" ")
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
-    }
-
-    function showStatus(message, type = "success") {
-      formStatusEl.textContent = message;
-      formStatusEl.className = `status-message show ${type}`;
-    }
-
-    function updateStats() {
-      totalServersEl.textContent = allServers.length;
-      filteredServersEl.textContent = filteredServers.length;
-      selectedTagsCountEl.textContent = activeTags.size;
-      favoritesOnlyBtnEl.textContent = `Show Favorites Only: ${favoritesOnly ? "On" : "Off"}`;
-    }
-
-    function getAllTags(servers) {
-      const counts = {};
-
-      PRESET_TAGS.forEach(tag => {
-        if (!BANNED_TAGS.includes(tag.value)) {
-          counts[tag.value] = 0;
-        }
-      });
-
-      servers.forEach(server => {
-        normalizeTags(server.tags).forEach(tag => {
-          if (!BANNED_TAGS.includes(tag)) {
-            counts[tag] = (counts[tag] || 0) + 1;
-          }
-        });
-      });
-
-      return Object.keys(counts).sort((a, b) => {
-        const countDiff = (counts[b] || 0) - (counts[a] || 0);
-        if (countDiff !== 0) return countDiff;
-        return a.localeCompare(b);
-      });
-    }
+    function saveOwnedPosts(map) { localStorage.setItem("windroseOwnedPosts", JSON.stringify(map)); }
+    function userOwnsPost(serverId) { return !!getOwnedPosts()[serverId]; }
 
     function getTagMeta(tag) {
       return PRESET_TAGS.find(item => item.value === tag) || null;
     }
 
+    function getTagCounts(servers) {
+      const counts = {};
+      PRESET_TAGS.forEach(tag => { if (!BANNED_TAGS.includes(tag.value)) counts[tag.value] = 0; });
+      servers.forEach(server => {
+        normalizeTags(server.tags).forEach(tag => {
+          if (!BANNED_TAGS.includes(tag)) counts[tag] = (counts[tag] || 0) + 1;
+        });
+      });
+      return counts;
+    }
+
+    function getAllTags(servers) {
+      const counts = getTagCounts(servers);
+      return Object.keys(counts).sort((a, b) => {
+        const diff = (counts[b] || 0) - (counts[a] || 0);
+        if (diff !== 0) return diff;
+        return a.localeCompare(b);
+      });
+    }
+
+    function renderTagFilters() {
+      const tags = getAllTags(allServers);
+      const counts = getTagCounts(allServers);
+      tagFiltersEl.innerHTML = tags.map(tag => {
+        const meta = getTagMeta(tag);
+        const label = meta ? meta.label : titleCase(tag);
+        const icon = meta ? meta.icon : "🏷️";
+        return `
+          <button class="tag-chip ${activeTags.has(tag) ? 'active' : ''}" type="button" data-tag="${escapeHtml(tag)}">
+            <span>${icon}</span>
+            <span>${escapeHtml(label)}</span>
+            <span class="tag-count">${counts[tag] || 0}</span>
+          </button>
+        `;
+      }).join("");
+
+      tagFiltersEl.querySelectorAll('[data-tag]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tag = btn.dataset.tag;
+          if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
+          renderTagFilters();
+          applyFilters();
+        });
+      });
+    }
+
     function renderPostTagButtons() {
       postTagButtonsEl.innerHTML = PRESET_TAGS.filter(tag => !BANNED_TAGS.includes(tag.value)).map(tag => `
         <button class="tag-chip ${selectedPostTags.includes(tag.value) ? 'active' : ''}" type="button" data-post-tag="${escapeHtml(tag.value)}">
-          <span>${tag.icon}</span><span>${escapeHtml(tag.label)}</span>
+          <span>${tag.icon}</span>
+          <span>${escapeHtml(tag.label)}</span>
         </button>
-      `).join('');
+      `).join("");
 
       postTagButtonsEl.querySelectorAll('[data-post-tag]').forEach(btn => {
         btn.addEventListener('click', () => {
           const tag = btn.dataset.postTag;
-
           if (selectedPostTags.includes(tag)) {
             selectedPostTags = selectedPostTags.filter(item => item !== tag);
           } else {
@@ -830,12 +329,9 @@
             }
             selectedPostTags.push(tag);
           }
-
-          document.getElementById('tags').value = selectedPostTags.join(', ');
           renderPostTagButtons();
         });
       });
-    });
     }
 
     function serverMatchesPlayersFilter(server, filterValue) {
@@ -845,6 +341,13 @@
       if (filterValue === "medium") return maxPlayers >= 26 && maxPlayers <= 64;
       if (filterValue === "large") return maxPlayers >= 65;
       return true;
+    }
+
+    function updateStats() {
+      totalServersEl.textContent = allServers.length;
+      filteredServersEl.textContent = filteredServers.length;
+      selectedTagsCountEl.textContent = activeTags.size;
+      favoritesOnlyBtnEl.textContent = `Show Favorites Only: ${favoritesOnly ? 'On' : 'Off'}`;
     }
 
     function applyFilters() {
@@ -859,20 +362,17 @@
         const searchableText = [server.name, server.description, server.invite_code, tags.join(" ")].join(" ").toLowerCase();
         const matchesSearch = !search || searchableText.includes(search);
         const matchesTags = activeTags.size === 0 || [...activeTags].every(tag => tags.includes(tag));
-
         let matchesModded = true;
-        if (moddedFilter === "modded") matchesModded = !!server.modded;
-        if (moddedFilter === "vanilla") matchesModded = !server.modded;
-
+        if (moddedFilter === 'modded') matchesModded = !!server.modded;
+        if (moddedFilter === 'vanilla') matchesModded = !server.modded;
         const matchesPlayers = serverMatchesPlayersFilter(server, playersFilter);
         const matchesFavorites = !favoritesOnly || favoriteIds.includes(server.id);
-
         return matchesSearch && matchesTags && matchesModded && matchesPlayers && matchesFavorites;
       });
 
       filteredServers.sort((a, b) => {
-        if (sortValue === "name_asc") return String(a.name || "").localeCompare(String(b.name || ""));
-        if (sortValue === "name_desc") return String(b.name || "").localeCompare(String(a.name || ""));
+        if (sortValue === 'name_asc') return String(a.name || '').localeCompare(String(b.name || ''));
+        if (sortValue === 'name_desc') return String(b.name || '').localeCompare(String(a.name || ''));
         return new Date(b.created_at || 0) - new Date(a.created_at || 0);
       });
 
@@ -880,44 +380,9 @@
       updateStats();
     }
 
-    function renderTagFilters() {
-      const tags = getAllTags(allServers);
-      if (!tags.length) {
-        tagFiltersEl.innerHTML = '<div class="helper">No tags found yet.</div>';
-        return;
-      }
-
-      tagFiltersEl.innerHTML = tags.map(tag => {
-        const meta = getTagMeta(tag);
-        const label = meta ? meta.label : titleCase(tag);
-        const count = allServers.reduce((total, server) => total + (normalizeTags(server.tags).includes(tag) ? 1 : 0), 0);
-        const icon = meta ? meta.icon + ' ' : '';
-        return `
-          <button class="tag-chip ${activeTags.has(tag) ? 'active' : ''}" type="button" data-tag="${escapeHtml(tag)}">
-            <span>${icon}</span><span>${escapeHtml(label)}</span><span style="opacity:.7;font-size:12px;">${count}</span>
-          </button>
-        `;
-      }).join("");
-
-      tagFiltersEl.querySelectorAll("[data-tag]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const tag = btn.dataset.tag;
-          if (activeTags.has(tag)) activeTags.delete(tag);
-          else activeTags.add(tag);
-          renderTagFilters();
-          applyFilters();
-        });
-      });
-    }
-
     function renderServers() {
       if (!filteredServers.length) {
-        serverListEl.innerHTML = `
-          <div class="empty">
-            <strong>No servers found.</strong><br>
-            Try clearing filters, turning favorites off, or changing your search.
-          </div>
-        `;
+        serverListEl.innerHTML = `<div class="empty"><strong>No servers found.</strong><br>Try clearing filters, turning favorites off, or posting the first server.</div>`;
         return;
       }
 
@@ -939,20 +404,13 @@
               </div>
               <div class="status-pill ${statusClass}">${statusLabel}</div>
             </div>
-
             <div class="meta-row">
               <div class="meta-pill">${escapeHtml(maxPlayers)}</div>
               <div class="meta-pill">Posted ${escapeHtml(createdAt)}</div>
             </div>
-
             <div class="server-tags">
-              ${tags.length ? tags.map(tag => `
-                <button class="mini-tag ${activeTags.has(tag) ? 'active' : ''}" type="button" data-server-tag="${escapeHtml(tag)}">
-                  ${escapeHtml(getTagMeta(tag)?.label || titleCase(tag))}
-                </button>
-              `).join("") : '<div class="meta-pill">No Tags</div>'}
+              ${tags.length ? tags.map(tag => `<button class="mini-tag ${activeTags.has(tag) ? 'active' : ''}" type="button" data-server-tag="${escapeHtml(tag)}">${escapeHtml(getTagMeta(tag)?.label || titleCase(tag))}</button>`).join('') : '<div class="meta-pill">No Tags</div>'}
             </div>
-
             <div class="server-actions">
               <button class="copy-btn" type="button" data-copy="${escapeHtml(server.invite_code || '')}">⧉ Copy Invite Code</button>
               <button class="favorite-btn ${favorite ? 'active' : ''}" type="button" data-favorite="${escapeHtml(server.id || '')}">${favorite ? '★ Favorited' : '☆ Favorite'}</button>
@@ -961,12 +419,12 @@
             </div>
           </article>
         `;
-      }).join("");
+      }).join('');
 
-      serverListEl.querySelectorAll("[data-copy]").forEach(btn => {
-        btn.addEventListener("click", async () => {
+      serverListEl.querySelectorAll('[data-copy]').forEach(btn => {
+        btn.addEventListener('click', async () => {
           try {
-            await navigator.clipboard.writeText(btn.dataset.copy || "");
+            await navigator.clipboard.writeText(btn.dataset.copy || '');
             const original = btn.textContent;
             btn.textContent = 'Copied';
             setTimeout(() => btn.textContent = original, 1200);
@@ -976,43 +434,33 @@
         });
       });
 
-      serverListEl.querySelectorAll("[data-server-tag]").forEach(btn => {
-        btn.addEventListener("click", () => {
+      serverListEl.querySelectorAll('[data-server-tag]').forEach(btn => {
+        btn.addEventListener('click', () => {
           const tag = btn.dataset.serverTag;
-          if (activeTags.has(tag)) activeTags.delete(tag);
-          else activeTags.add(tag);
+          if (activeTags.has(tag)) activeTags.delete(tag); else activeTags.add(tag);
           renderTagFilters();
           applyFilters();
         });
       });
 
-      serverListEl.querySelectorAll("[data-favorite]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          toggleFavorite(btn.dataset.favorite);
-        });
+      serverListEl.querySelectorAll('[data-favorite]').forEach(btn => {
+        btn.addEventListener('click', () => toggleFavorite(btn.dataset.favorite));
       });
 
-      serverListEl.querySelectorAll("[data-delete]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          deleteServer(btn.dataset.delete);
-        });
+      serverListEl.querySelectorAll('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', () => deleteServer(btn.dataset.delete));
       });
     }
 
     async function loadServers() {
       serverListEl.innerHTML = '<div class="empty">Loading servers...</div>';
-
-      const { data, error } = await client
-        .from(TABLE_NAME)
-        .select('*')
-        .order('created_at', { ascending: false });
-
+      const { data, error } = await client.from(TABLE_NAME).select('*').order('created_at', { ascending: false });
       if (error) {
         console.error(error);
         serverListEl.innerHTML = '<div class="empty">Could not load servers. Check Supabase settings.</div>';
+        renderTagFilters();
         return;
       }
-
       allServers = Array.isArray(data) ? data : [];
       renderTagFilters();
       applyFilters();
@@ -1021,7 +469,6 @@
     async function createServer(event) {
       event.preventDefault();
       showStatus('Posting server...', 'success');
-
       const formData = new FormData(serverFormEl);
       const ownerToken = generateOwnerToken();
       const ownerTokenHash = await sha256(ownerToken);
@@ -1040,21 +487,15 @@
         showStatus('Server name and invite code are required.', 'error');
         return;
       }
-
       if (!payload.max_players || payload.max_players < 1) {
         showStatus('Max player count is required.', 'error');
         return;
       }
 
-      const { data, error } = await client
-        .from(TABLE_NAME)
-        .insert([payload])
-        .select('id')
-        .single();
-
+      const { data, error } = await client.from(TABLE_NAME).insert([payload]).select('id').single();
       if (error) {
         console.error(error);
-        showStatus('Could not post server. Check your table columns and RLS rules.', 'error');
+        showStatus(error.message || 'Could not post server. Check table columns and RLS.', 'error');
         return;
       }
 
@@ -1066,55 +507,33 @@
 
       serverFormEl.reset();
       selectedPostTags = [];
-      document.getElementById('tags').value = '';
       renderPostTagButtons();
       showStatus('Server posted successfully.', 'success');
-      await renderPostTagButtons();
-    loadServers();
+      await loadServers();
     }
 
     async function deleteServer(id) {
       const owned = getOwnedPosts();
       const ownerToken = owned[id];
-
       if (!ownerToken) {
         alert('You can only delete posts created from this browser.');
         return;
       }
-
       if (!confirm('Delete this server?')) return;
-
       const ownerTokenHash = await sha256(ownerToken);
-
-      const { error } = await client
-        .from(TABLE_NAME)
-        .delete()
-        .eq('id', id)
-        .eq('owner_token_hash', ownerTokenHash);
-
+      const { error } = await client.from(TABLE_NAME).delete().eq('id', id).eq('owner_token_hash', ownerTokenHash);
       if (error) {
         console.error(error);
         alert('Failed to delete server.');
         return;
       }
-
       delete owned[id];
       saveOwnedPosts(owned);
       await loadServers();
     }
 
-    searchBtnEl.addEventListener('click', () => {
-      currentSearch = searchInputEl.value;
-      applyFilters();
-    });
-
-    searchInputEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        currentSearch = searchInputEl.value;
-        applyFilters();
-      }
-    });
-
+    searchBtnEl.addEventListener('click', () => { currentSearch = searchInputEl.value; applyFilters(); });
+    searchInputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { currentSearch = searchInputEl.value; applyFilters(); } });
     clearFiltersBtnEl.addEventListener('click', () => {
       activeTags.clear();
       currentSearch = '';
@@ -1126,18 +545,15 @@
       renderTagFilters();
       applyFilters();
     });
-
-    favoritesOnlyBtnEl.addEventListener('click', () => {
-      favoritesOnly = !favoritesOnly;
-      applyFilters();
-    });
-
+    favoritesOnlyBtnEl.addEventListener('click', () => { favoritesOnly = !favoritesOnly; applyFilters(); });
     sortSelectEl.addEventListener('change', applyFilters);
     moddedFilterEl.addEventListener('change', applyFilters);
     playersFilterEl.addEventListener('change', applyFilters);
     refreshBtnEl.addEventListener('click', loadServers);
     serverFormEl.addEventListener('submit', createServer);
 
+    renderPostTagButtons();
+    renderTagFilters();
     loadServers();
   </script>
 </body>
