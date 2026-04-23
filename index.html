@@ -7,9 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --bg: #050d1d;
@@ -20,12 +18,8 @@
       --text: #f3f6ff;
       --muted: #9aa8c7;
       --chip: #132544;
-      --chip-active: linear-gradient(135deg, #5f78ff, #b04dff);
       --blue: #5f78ff;
       --purple: #b04dff;
-      --green: #23d17f;
-      --yellow: #f3c746;
-      --red: #ff5d5d;
       --shadow: 0 10px 30px rgba(0,0,0,0.28);
     }
 
@@ -153,15 +147,17 @@
 
     .search-top {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 520px) auto;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
+      align-items: start;
     }
 
     .search-actions {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      width: 130px;
     }
 
     input, textarea, select {
@@ -200,6 +196,7 @@
       font-weight: 800;
       cursor: pointer;
       color: white;
+      width: 100%;
     }
 
     .btn-refresh {
@@ -225,29 +222,34 @@
     .tag-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       margin-bottom: 18px;
     }
 
     .tag-chip {
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06);
       background: #132544;
       color: #f3f6ff;
-      padding: 12px 16px;
+      padding: 11px 14px;
       border-radius: 14px;
       cursor: pointer;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 14px;
       transition: 0.18s ease;
       user-select: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
     }
 
     .tag-chip:hover {
       transform: translateY(-1px);
+      background: #193154;
     }
 
     .tag-chip.active {
-      background: linear-gradient(135deg, rgba(95,120,255,0.92), rgba(176,77,255,0.92));
+      background: linear-gradient(135deg, rgba(95,120,255,0.95), rgba(176,77,255,0.95));
       border-color: transparent;
     }
 
@@ -356,13 +358,9 @@
       font-size: 16px;
     }
 
-    .muted {
-      color: var(--muted);
-    }
-
     .footer {
       background: linear-gradient(180deg, rgba(8,21,44,0.96), rgba(7,18,37,0.96));
-      border: 1px solid var(--soft-border);
+      border: 1px solid rgba(255,255,255,0.05);
       border-radius: 18px;
       padding: 22px;
       color: #b8c3df;
@@ -390,6 +388,7 @@
       }
 
       .search-actions {
+        width: 100%;
         flex-direction: row;
       }
     }
@@ -455,7 +454,6 @@
     </div>
 
     <div class="layout">
-      <!-- LEFT -->
       <div class="panel">
         <div class="panel-title">Find a Server</div>
 
@@ -508,7 +506,6 @@
         <div id="serverList" class="server-list"></div>
       </div>
 
-      <!-- RIGHT -->
       <div class="panel">
         <div class="panel-title">Post Your Server</div>
 
@@ -556,7 +553,7 @@
             <div id="postTags" class="tag-row"></div>
           </div>
 
-          <button class="btn btn-post" type="submit" style="width:100%; margin-top:10px;">Post Server</button>
+          <button class="btn btn-post" type="submit" style="margin-top:10px;">Post Server</button>
         </form>
       </div>
     </div>
@@ -574,24 +571,24 @@
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const TAGS = [
-      "new player friendly",
-      "roleplay",
-      "modded",
-      "chill / casual",
-      "hardcore",
-      "pve",
-      "pvp",
-      "survival",
-      "events",
-      "loot boosted",
-      "low pop",
-      "high pop",
-      "community",
-      "weekly wipe",
-      "solo friendly",
-      "base building",
-      "raiding",
-      "active admins"
+      "New Player Friendly",
+      "Roleplay",
+      "Modded",
+      "Chill / Casual",
+      "Hardcore",
+      "PvE",
+      "PvP",
+      "Survival",
+      "Events",
+      "Loot Boosted",
+      "Low Pop",
+      "High Pop",
+      "Community",
+      "Weekly Wipe",
+      "Solo Friendly",
+      "Base Building",
+      "Raiding",
+      "Active Admins"
     ];
 
     let allServers = [];
@@ -599,7 +596,7 @@
     let selectedPostTags = [];
 
     function escapeHtml(text) {
-      if (!text) return "";
+      if (text === null || text === undefined) return "";
       return String(text)
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
@@ -614,13 +611,25 @@
       return d.toLocaleDateString();
     }
 
+    function normalizeTags(tags) {
+      if (!Array.isArray(tags)) return [];
+      return tags.map(t => String(t).trim()).filter(Boolean);
+    }
+
     function renderSearchTags() {
       const box = document.getElementById("quickTags");
       box.innerHTML = TAGS.map(tag => `
-        <div class="tag-chip ${selectedSearchTags.includes(tag) ? "active" : ""}" onclick="toggleSearchTag('${tag.replaceAll("'", "\\'")}')">
+        <div class="tag-chip ${selectedSearchTags.includes(tag) ? "active" : ""}" data-tag="${escapeHtml(tag)}">
           ${escapeHtml(tag)}
         </div>
       `).join("");
+
+      box.querySelectorAll(".tag-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const tag = chip.dataset.tag;
+          toggleSearchTag(tag);
+        });
+      });
 
       document.getElementById("selectedTagCount").textContent = selectedSearchTags.length;
     }
@@ -628,10 +637,17 @@
     function renderPostTags() {
       const box = document.getElementById("postTags");
       box.innerHTML = TAGS.map(tag => `
-        <div class="tag-chip ${selectedPostTags.includes(tag) ? "active" : ""}" onclick="togglePostTag('${tag.replaceAll("'", "\\'")}')">
+        <div class="tag-chip ${selectedPostTags.includes(tag) ? "active" : ""}" data-tag="${escapeHtml(tag)}">
           ${escapeHtml(tag)}
         </div>
       `).join("");
+
+      box.querySelectorAll(".tag-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const tag = chip.dataset.tag;
+          togglePostTag(tag);
+        });
+      });
     }
 
     function toggleSearchTag(tag) {
@@ -668,7 +684,11 @@
         return;
       }
 
-      allServers = data || [];
+      allServers = (data || []).map(server => ({
+        ...server,
+        tags: normalizeTags(server.tags)
+      }));
+
       document.getElementById("totalServers").textContent = allServers.length;
       applyFilters();
     }
@@ -684,7 +704,7 @@
         const desc = (server.description || "").toLowerCase();
         const invite = (server.invite_code || "").toLowerCase();
         const type = (server.server_type || "").toLowerCase();
-        const tags = Array.isArray(server.tags) ? server.tags : [];
+        const tags = normalizeTags(server.tags);
         const tagText = tags.join(" ").toLowerCase();
         const maxPlayers = Number(server.max_players || 0);
 
@@ -695,13 +715,8 @@
           invite.includes(search) ||
           tagText.includes(search);
 
-        const matchesType =
-          !typeFilter ||
-          type === typeFilter;
-
-        const matchesPlayers =
-          !playersFilter ||
-          maxPlayers >= Number(playersFilter);
+        const matchesType = !typeFilter || type === typeFilter;
+        const matchesPlayers = !playersFilter || maxPlayers >= Number(playersFilter);
 
         const matchesTags =
           selectedSearchTags.length === 0 ||
@@ -742,7 +757,7 @@
       }
 
       box.innerHTML = servers.map(server => {
-        const tags = Array.isArray(server.tags) ? server.tags : [];
+        const tags = normalizeTags(server.tags);
         const type = server.server_type || "unknown";
         const playerLabel = server.max_players ? `${server.max_players} Players` : "No Player Limit Set";
         const desc = server.description?.trim() ? server.description : "No description provided.";
@@ -831,10 +846,6 @@
       renderSearchTags();
       applyFilters();
     });
-
-    window.toggleSearchTag = toggleSearchTag;
-    window.togglePostTag = togglePostTag;
-    window.copyInvite = copyInvite;
 
     renderSearchTags();
     renderPostTags();
